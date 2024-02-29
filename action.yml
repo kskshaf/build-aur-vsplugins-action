@@ -1,0 +1,15 @@
+name: 'Build AUR Package'
+description: 'Test build an AUR package in Docker container'
+branding:
+  icon: user-check
+  color: gray-dark
+inputs:
+  repo-name:
+    description: 'AUR repository name to build'
+    required: true
+    default: 'vs-plugins-build'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.repo-name }}

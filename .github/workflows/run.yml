@@ -1,6 +1,6 @@
 name: Build
 
-on: [workflow_dispatch]
+on: [workflow_dispatch, push]
 
 jobs:
   build:
@@ -10,7 +10,7 @@ jobs:
     - name: Build
       uses: kskshaf/build-aur-vsplugins-action@main
       with:
-        repo-name: build-aur-vsplugins-action
+        repo-name: build-vsplugins-action
     - name: Upload
       uses: actions/upload-artifact@v4
       with:

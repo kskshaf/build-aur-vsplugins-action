@@ -7,7 +7,7 @@ inputs:
   repo-name:
     description: 'AUR repository name to build'
     required: true
-    default: 'build-aur-vsplugins-action'
+    default: 'build-vsplugins-action'
 runs:
   using: 'docker'
   image: 'Dockerfile'

@@ -10,7 +10,7 @@ jobs:
     - name: Build
       uses: kskshaf/build-aur-vsplugins-action@main
       with:
-        repo-name: vs-plugins-build
+        repo-name: build-aur-vsplugins-action
     - name: Upload
       uses: actions/upload-artifact@v4
       with:

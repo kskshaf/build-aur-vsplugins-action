@@ -17,15 +17,16 @@ export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs clang15 compiler-rt15 llvm15 llvm15-libs boost rust onetbb meson wget curl cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
+pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs yay boost rust onetbb meson wget curl cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
+yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs
 
 echo -e "\e[42m Build custom python \e[0m"
-wget -c https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
-tar xf Python-3.11.7.tgz
-cd Python-3.11.7
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python3117_conf.log
-make -j$(nproc) > $OWN_PREFIX/python3117_make.log
-sudo make altinstall > $OWN_PREFIX/python3117_install.log
+wget -c https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
+tar xf Python-3.11.9.tgz
+cd Python-3.11.9
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python3119_conf.log
+make -j$(nproc) > $OWN_PREFIX/python3119_make.log
+sudo make altinstall > $OWN_PREFIX/python3119_install.log
 sudo make clean -j$(nproc)
 cd ..
 export PATH="$OWN_PREFIX/bin:$PATH"

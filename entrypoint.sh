@@ -19,14 +19,9 @@ export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_syste
 echo -e "\e[42m Pacman Install \e[0m"
 pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget curl cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
 
-# build yay
-useradd -m -s /usr/bin/bash yay-build
-chmod +w /etc/sudoers
-echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-chmod -w /etc/sudoers
-su - yay-build
-git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
-exit
+# install yay
+wget https://github.com/Jguer/yay/releases/download/v12.3.5/yay_12.3.5_x86_64.tar.gz
+pacman -U yay_12.3.5_x86_64.tar.gz
 
 yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs
 

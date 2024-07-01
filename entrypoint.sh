@@ -23,7 +23,7 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 useradd -m -s /usr/bin/bash yay-build
 chmod +w /etc/sudoers
 echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-chmod -w /etc/sudoer
+chmod -w /etc/sudoers
 su - yay-build
 git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
 exit

@@ -20,7 +20,11 @@ echo -e "\e[42m Pacman Install \e[0m"
 pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
 
 # build yay
-su - nobody -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si"
+useradd -m -s /usr/bin/bash yay-build
+chmod +w /etc/sudoers
+echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+chmod -w /etc/sudoer
+su - yay-build -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si"
 
 yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs
 

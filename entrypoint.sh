@@ -25,7 +25,7 @@ chmod +w /etc/sudoers
 echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 chmod -w /etc/sudoers
 su - yay-build -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -s"
-pacman -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
+pacman --noconfirm -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
 
 yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs
 

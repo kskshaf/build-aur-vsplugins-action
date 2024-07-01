@@ -19,7 +19,7 @@ export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_syste
 echo -e "\e[42m Pacman Install \e[0m"
 pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
 
-# build yay
+echo -e "\e[42m Install yay \e[0m"
 useradd -m -s /usr/bin/bash yay-build
 chmod +w /etc/sudoers
 echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -27,7 +27,7 @@ chmod -w /etc/sudoers
 su - yay-build -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -s"
 pacman --noconfirm -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
 
-yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs
+su - yay-build -c "yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs"
 
 echo -e "\e[42m Build custom python \e[0m"
 wget -c https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz

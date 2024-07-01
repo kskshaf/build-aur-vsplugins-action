@@ -19,15 +19,15 @@ export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_syste
 echo -e "\e[42m Pacman Install \e[0m"
 pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
 
-echo -e "\e[42m Install yay \e[0m"
-useradd -m -s /usr/bin/bash yay-build
-chmod +w /etc/sudoers
-echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-chmod -w /etc/sudoers
-su - yay-build -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -s"
-pacman --noconfirm -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
+#echo -e "\e[42m Install yay \e[0m"
+#useradd -m -s /usr/bin/bash yay-build
+#chmod +w /etc/sudoers
+#echo "yay-build  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+#chmod -w /etc/sudoers
+#su - yay-build -c "git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -s"
+#pacman --noconfirm -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
 
-su - yay-build -c "yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs"
+#su - yay-build -c "yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs"
 
 echo -e "\e[42m Build custom python \e[0m"
 wget -c https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
@@ -217,15 +217,15 @@ sudo mv dfttest2.py $VSFUNCPH
 cd ..
 
 # build akarin
-echo -e "\e[42m Build akarin \e[0m"
-git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
-cd akarin-plugin
-sed -i 's/true/false/' meson_options.txt
-LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-sudo install ./build/libakarin.so $VSPLGPH
-ninja -C build clean
-cd ..
+#echo -e "\e[42m Build akarin \e[0m"
+#git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
+#cd akarin-plugin
+#sed -i 's/true/false/' meson_options.txt
+#LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+#ninja -C build
+#sudo install ./build/libakarin.so $VSPLGPH
+#ninja -C build clean
+#cd ..
 
 # build boxblur
 echo -e "\e[42m Build boxblur \e[0m"

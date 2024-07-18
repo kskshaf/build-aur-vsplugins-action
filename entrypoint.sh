@@ -29,6 +29,14 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 
 #su - yay-build -c "yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs"
 
+echo -e "\e[42m Install llvm15 pkg \e[0m"
+wget https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-15.0.7-1-x86_64.pkg.tar.zst
+wget https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst
+wget https://github.com/kskshaf/build-aur-llvm15/releases/download/new/clang15-15.0.7-2-x86_64.pkg.tar.zst
+wget https://github.com/kskshaf/build-aur-llvm15/releases/download/new/compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
+
+pacman -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
+
 echo -e "\e[42m Build custom python \e[0m"
 wget -c https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
 tar xf Python-3.11.9.tgz

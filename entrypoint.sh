@@ -78,9 +78,17 @@ popd
 sudo make clean -j$(nproc)
 cd ..
 
-# build f3kdb
-echo -e "\e[42m Build f3kdb \e[0m"
-/build_f3kdb.sh
+# build akarin
+echo -e "\e[42m Build akarin \e[0m"
+git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
+cd akarin-plugin
+sed -i 's/true/false/' meson_options.txt
+LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+ninja -C build
+sudo install ./build/libakarin.so $VSPLGPH
+ninja -C build clean
+cd ..
+exit 1
 
 # build dav1d
 echo -e "\e[42m Build dav1d \e[0m"
@@ -223,17 +231,6 @@ sudo cmake --install build --prefix $OWN_PREFIX
 ninja -C build clean
 sudo mv dfttest2.py $VSFUNCPH
 cd ..
-
-# build akarin
-#echo -e "\e[42m Build akarin \e[0m"
-#git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
-#cd akarin-plugin
-#sed -i 's/true/false/' meson_options.txt
-#LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-#ninja -C build
-#sudo install ./build/libakarin.so $VSPLGPH
-#ninja -C build clean
-#cd ..
 
 # build boxblur
 echo -e "\e[42m Build boxblur \e[0m"
@@ -645,6 +642,11 @@ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure
 make -j$(nproc)
 sudo install .libs/libhqdn3d* $VSPLGPH
 cd ..
+
+
+# build f3kdb
+# echo -e "\e[42m Build f3kdb \e[0m"
+# /build_f3kdb.sh
 
 # build x264_mod
 echo -e "\e[42m Build x264_mod \e[0m"

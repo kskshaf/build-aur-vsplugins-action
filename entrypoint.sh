@@ -28,6 +28,16 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 #pacman --noconfirm -U /home/yay-build/yay-bin/yay-bin-12.3.5-1-x86_64.pkg.tar.zst
 
 #su - yay-build -c "yay --noconfirm -S clang15 compiler-rt15 llvm15 llvm15-libs"
+## pacman pkgs:
+##  boost
+##  bzip2
+##  brotli
+##  harfbuzz
+##  libpng16
+##  frei0r
+##  freetype
+##  ladspa
+
 
 echo -e "\e[42m Install llvm15 pkg \e[0m"
 wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-15.0.7-1-x86_64.pkg.tar.zst
@@ -38,13 +48,13 @@ wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/compil
 pacman --noconfirm -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
 echo -e "\e[42m Build custom python \e[0m"
-wget -c https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
-tar xf Python-3.11.9.tgz
-cd Python-3.11.9
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python3119_conf.log
-make -j$(nproc) > $OWN_PREFIX/python3119_make.log
-sudo make altinstall > $OWN_PREFIX/python3119_install.log
-sudo make clean -j$(nproc)
+wget -c https://www.python.org/ftp/python/3.11.10/Python-3.11.10.tar.xz
+tar xf Python-3.11.10.tar.xz
+cd Python-3.11.10
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python311_10_conf.log
+make -j$(nproc) > $OWN_PREFIX/python311_10_make.log
+make altinstall > $OWN_PREFIX/python311_10_install.log
+make clean -j$(nproc)
 cd ..
 export PATH="$OWN_PREFIX/bin:$PATH"
 
@@ -52,30 +62,30 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 echo -e "\e[42m Build zimg \e[0m"
 git clone https://github.com/sekrit-twc/zimg.git --depth 1 --recurse-submodules --shallow-submodules
 cd zimg
-git checkout 71431815950664f1e11b9ee4e5d4ba23d6d997f1
+#git checkout 71431815950664f1e11b9ee4e5d4ba23d6d997f1
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo make install -j$(nproc)
-sudo make clean -j$(nproc)
+make install -j$(nproc)
+make clean -j$(nproc)
 cd ..
 
 # build vapoursynth
 echo -e "\e[42m Build vapoursynth \e[0m"
-$OWN_PREFIX/bin/python3.11 -m pip install --upgrade pip
-$OWN_PREFIX/bin/pip3.11 install --upgrade cython setuptools wheel pypng
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.11 -m pip install -U pip
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/pip3.11 install -U cython setuptools wheel pypng zstandard fonttools
 git clone --recursive https://github.com/vapoursynth/vapoursynth.git
 cd vapoursynth
 git checkout 329ca497b17c324eac701aa1b20652e558e5d281
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo make install -j$(nproc)
-$OWN_PREFIX/bin/python3.11 setup.py sdist -d sdist
+make install -j$(nproc)
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.11 setup.py sdist -d sdist
 mkdir -p empty && pushd empty
-PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.11 install vapoursynth --no-index --find-links ../sdist
+PYTHONUSERBASE=$OWN_PREFIX PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.11 install vapoursynth --no-index --find-links ../sdist
 popd
-sudo make clean -j$(nproc)
+make clean -j$(nproc)
 cd ..
 
 # build akarin
@@ -85,19 +95,19 @@ cd akarin-plugin
 sed -i 's/true/false/' meson_options.txt
 LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install ./build/libakarin.so $VSPLGPH
+mkdir -p $VSPLGPH
+install ./build/libakarin.so $VSPLGPH
 ninja -C build clean
 cd ..
-exit 1
 
 # build dav1d
 echo -e "\e[42m Build dav1d \e[0m"
-git clone https://code.videolan.org/videolan/dav1d.git --depth 1
+git clone https://code.videolan.org/videolan/dav1d.git --branch 1.4.3 --depth 1
 pushd dav1d
 mkdir build && cd build
 meson setup --prefix=$OWN_PREFIX -Denable_tools=false -Denable_tests=false --default-library=static --buildtype release . ..
 ninja
-sudo ninja install
+ninja install
 ninja clean
 popd
 
@@ -105,40 +115,40 @@ popd
 echo -e "\e[42m Install nv-codec-headers \e[0m"
 git clone --recursive https://github.com/FFmpeg/nv-codec-headers --depth 1
 cd nv-codec-headers
-sudo make install -j$(nproc)
-sudo cp /usr/local/lib/pkgconfig/ffnvcodec.pc $OWN_PREFIX/lib/pkgconfig/
+#sed -i 's/\/usr\/local/$OWN_PREFIX/' Makefile
+make install -j$(nproc)
 cd ..
 
 # build libvpx
 echo -e "\e[42m Build libvpx \e[0m"
-git clone --recursive https://github.com/webmproject/libvpx.git --depth 1
+git clone --recursive https://github.com/webmproject/libvpx.git --branch v1.14.1 --depth 1
 mkdir libvpx/builds && pushd libvpx/builds
 PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX --as=nasm --enable-vp9-highbitdepth --disable-docs --disable-tools --disable-examples --disable-webm-io --disable-vp8-encoder --disable-vp9-encoder
 make -j$(nproc)
-sudo make install -j$(nproc)
+make install -j$(nproc)
 make clean
 popd
 
 # build libxml2
 echo -e "\e[42m Build libxml2 \e[0m"
-git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.12.3 --depth 1
+git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.12.9 --depth 1
 cd libxml2
 PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./autogen.sh
 CFLAGS='-O2 -fno-semantic-interposition' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo make install -j$(nproc)
-sudo cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2.pc
-sudo cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2s.pc
+make install -j$(nproc)
+cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2.pc
+cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2s.pc
 make clean
 cd ..
 
-# build ffmpeg
-echo -e "\e[42m Build ffmpeg \e[0m"
+# build ffmpeg for lsmashsource
+echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
 git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
 pushd FFmpeg
 PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-debug --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
 make -j$(nproc)
-sudo make install -j$(nproc)
+make install -j$(nproc)
 make clean
 popd
 
@@ -148,13 +158,13 @@ git clone --recursive https://github.com/dwbuiten/obuparse --depth 1
 pushd obuparse
 gcc -O2 -c obuparse.c
 ar r libobuparse.a obuparse.o
-sudo install obuparse.h $MYICPH
-sudo install libobuparse.a $MYLDPH
+install obuparse.h $MYICPH
+install libobuparse.a $MYLDPH
 rm -rf *.a *.o
 popd
 
-# build l-smash
-echo -e "\e[42m Build l-smash \e[0m"
+# build l-smash static-libs
+echo -e "\e[42m Build l-smash static-libs \e[0m"
 git clone --recursive https://github.com/kskshaf/l-smash --depth 1
 pushd l-smash
 mv configure configure.old
@@ -162,7 +172,7 @@ sed 's/-Wl,--version-script,liblsmash.ver//g' configure.old >configure
 chmod +x configure
 ./configure --prefix=$OWN_PREFIX --extra-cflags="-I$MYICPH -fPIC"  --extra-ldflags=-L$MYLDPH
 make static-lib -j$(nproc)
-sudo make install-lib -j$(nproc)
+make install-lib -j$(nproc)
 make clean
 popd
 
@@ -172,7 +182,7 @@ git clone --recursive https://github.com/Cyan4973/xxHash --branch v0.8.2 --depth
 pushd xxHash
 cmake -S ./cmake_unofficial -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DXXHASH_BUILD_XXHSUM=OFF -DBUILD_SHARED_LIBS=OFF
 cmake --build build
-sudo cmake --install build --prefix $OWN_PREFIX
+cmake --install build --prefix $OWN_PREFIX
 ninja -C build clean
 popd
 
@@ -182,7 +192,7 @@ git clone --recursive https://github.com/AviSynth/AviSynthPlus --branch 3.7 --de
 pushd AviSynthPlus
 cmake -S . -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DENABLE_PLUGINS=OFF -DENABLE_INTEL_SIMD=OFF
 cmake --build build
-sudo cmake --install build --prefix $OWN_PREFIX
+cmake --install build --prefix $OWN_PREFIX
 ninja -C build clean
 popd
 
@@ -192,22 +202,108 @@ git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/L-SMASH-Wor
 pushd L-SMASH-Works/VapourSynth
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 ninja -C build clean
+popd
+
+# build l-smash exec
+# muxer remuxer boxdumper timelineeditor
+echo -e "\e[42m Build l-smash exec \e[0m"
+pushd l-smash
+make all -j$(nproc)
+make install -j$(nproc)
+make clean
+popd
+
+# build ffmpeg 6.1.2
+echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
+pushd FFmpeg
+make uninstall -j$(nproc)
+popd
+pacman --noconfirm -S amf-headers frei0r ladspa libass
+git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
+pushd ffmpeg
+./configure --prefix=$OWN_PREFIX \
+  --disable-debug --disable-static \
+  --disable-stripping \
+  --enable-amf \
+  --enable-avisynth \
+  --enable-cuda-llvm \
+  --enable-lto \
+  --enable-fontconfig \
+  --enable-frei0r \
+  --enable-gmp \
+  --enable-gnutls \
+  --enable-gpl \
+  --enable-ladspa \
+  --enable-libaom \
+  --enable-libass \
+  --enable-libbluray \
+  --enable-libbs2b \
+  --enable-libdav1d \
+  --enable-libdrm \
+  --enable-libfreetype \
+  --enable-libfribidi \
+  --enable-libgsm \
+  --enable-libharfbuzz \
+  --enable-libiec61883 \
+  --enable-libjack \
+  --enable-libjxl \
+  --enable-libmodplug \
+  --enable-libmp3lame \
+  --enable-libopencore_amrnb \
+  --enable-libopencore_amrwb \
+  --enable-libopenjpeg \
+  --enable-libopenmpt \
+  --enable-libopus \
+  --enable-libplacebo \
+  --enable-libpulse \
+  --enable-librav1e \
+  --enable-librsvg \
+  --enable-librubberband \
+  --enable-libsnappy \
+  --enable-libsoxr \
+  --enable-libspeex \
+  --enable-libsrt \
+  --enable-libssh \
+  --enable-libsvtav1 \
+  --enable-libtheora \
+  --enable-libv4l2 \
+  --enable-libvidstab \
+  --enable-libvmaf \
+  --enable-libvorbis \
+  --enable-libvpl \
+  --enable-libvpx \
+  --enable-libwebp \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-libxcb \
+  --enable-libxml2 \
+  --enable-libxvid \
+  --enable-libzimg \
+  --enable-nvdec \
+  --enable-nvenc \
+  --enable-opencl \
+  --enable-opengl \
+  --enable-shared \
+  --enable-vapoursynth \
+  --enable-version3 \
+  --enable-vulkan
+make -j$(nproc)
+make tools/qt-faststart
+make install -j$(nproc)
+install -Dm 755 tools/qt-faststart $OWN_PREFIX/bin/
+make clean
 popd
 
 # build ffms2
 echo -e "\e[42m Build ffms2 \e[0m"
-pushd FFmpeg
-sudo make uninstall -j$(nproc)
-popd
-pacman --noconfirm -S ffmpeg gst-libav
 git clone --recursive https://github.com/FFMS/ffms2.git --depth 1
 cd ffms2
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh --prefix=$OWN_PREFIX
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
 make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
-sudo make install
+make install
 make clean
 cd ..
 
@@ -217,7 +313,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-TCanny
 CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 ninja -C build clean
 cd ..
 
@@ -225,11 +321,11 @@ cd ..
 echo -e "\e[42m Build dfttest2 \e[0m"
 git clone --recursive https://github.com/AmusementClub/vs-dfttest2.git --depth 1
 cd vs-dfttest2
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-12 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
 cmake --build build --config Release --verbose
-sudo cmake --install build --prefix $OWN_PREFIX
+cmake --install build --prefix $OWN_PREFIX
 ninja -C build clean
-sudo mv dfttest2.py $VSFUNCPH
+mv dfttest2.py $VSFUNCPH
 cd ..
 
 # build boxblur
@@ -238,7 +334,7 @@ git clone --recursive https://github.com/AmusementClub/vs-boxblur.git --depth 1
 cd vs-boxblur
 PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -DCMAKE_INSTALL_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE="-ffast-math -Wall $NATIVE"
 cmake --build build
-sudo cmake --install build --prefix $OWN_PREFIX
+cmake --install build --prefix $OWN_PREFIX
 cd ..
 
 # build vsrawsource
@@ -247,7 +343,8 @@ git clone --recursive https://github.com/AmusementClub/vsrawsource.git --depth 1
 cd vsrawsource
 PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
+ninja -C build clean
 cd ..
 
 # build subtext
@@ -256,7 +353,7 @@ git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
 cd subtext
 CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build bm3dcuda
@@ -265,8 +362,8 @@ git clone --recursive https://github.com/WolframRhodium/VapourSynth-BM3DCUDA --d
 cd VapourSynth-BM3DCUDA
 PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real"
 cmake --build build --verbose
-sudo cmake --install build --prefix $OWN_PREFIX
-sudo mv $OWN_PREFIX/lib/libbm3d* $VSPLGPH
+cmake --install build --prefix $OWN_PREFIX
+mv $OWN_PREFIX/lib/libbm3d* $VSPLGPH
 cd ..
 
 # build fmtc
@@ -276,8 +373,8 @@ pushd fmtconv/build/unix
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo make install
-sudo mv $OWN_PREFIX/lib/libfmtconv* $VSPLGPH
+make install
+mv $OWN_PREFIX/lib/libfmtconv* $VSPLGPH
 popd
 
 # build bm3d
@@ -286,7 +383,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-BM3D
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build dctfilter
@@ -295,7 +392,7 @@ git clone --recursive https://github.com/AmusementClub/VapourSynth-DCTFilter --d
 cd VapourSynth-DCTFilter
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build fft3dfilter
@@ -304,7 +401,7 @@ git clone --recursive https://github.com/AmusementClub/VapourSynth-FFT3DFilter -
 cd VapourSynth-FFT3DFilter
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build descale & collect descale functions
@@ -314,8 +411,8 @@ git clone https://github.com/Irrational-Encoding-Wizardry/descale --depth 1
 cd descale
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
-sudo mv descale.py $VSFUNCPH
+ninja -C build install
+mv descale.py $VSFUNCPH
 cd ..
 
 # build knlm
@@ -325,7 +422,7 @@ git clone --recursive https://github.com/pinterf/KNLMeansCL.git --depth 1
 cd KNLMeansCL
 CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build knlm-cuda
@@ -334,7 +431,7 @@ git clone --recursive https://github.com/AmusementClub/vs-nlm-cuda --depth 1
 cd vs-nlm-cuda
 PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -D VS_INCLUDE_DIR="$MYICPH/vapoursynth" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -ffast-math" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real"
 cmake --build build --config Release --verbose
-sudo cmake --install build --prefix $OWN_PREFIX
+cmake --install build --prefix $OWN_PREFIX
 cd ..
 
 # build mvtools
@@ -343,8 +440,8 @@ git clone --recursive https://github.com/dubhater/vapoursynth-mvtools --depth 1
 cd vapoursynth-mvtools
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
-sudo mv $OWN_PREFIX/lib/libmvtools* $VSPLGPH
+ninja -C build install
+mv $OWN_PREFIX/lib/libmvtools* $VSPLGPH
 cd ..
 
 # build vsremovegrain
@@ -353,7 +450,7 @@ git clone --recursive https://github.com/vapoursynth/vs-removegrain --depth 1
 cd vs-removegrain
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build Bilateral
@@ -362,7 +459,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-Bilateral
 PKG_CONFIG_PATH=$MYPKGPH ./configure --install="$VSPLGPH" --extra-cxxflags="$NATIVE"
 make -j$(nproc)
-sudo make install
+make install
 cd ..
 
 # build BilateralGPU
@@ -371,8 +468,8 @@ git clone --recursive https://github.com/WolframRhodium/VapourSynth-BilateralGPU
 cd VapourSynth-BilateralGPU
 PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -LA -DCMAKE_BUILD_TYPE=Release -DUSE_NVRTC_STATIC=ON -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math -march=$cpu" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;75-real;86-real;89-real"
 cmake --build build --verbose
-sudo cmake --install build --prefix $OWN_PREFIX
-sudo mv $OWN_PREFIX/lib/libbilateralgpu* $VSPLGPH
+cmake --install build --prefix $OWN_PREFIX
+mv $OWN_PREFIX/lib/libbilateralgpu* $VSPLGPH
 cd ..
 
 # build cas
@@ -381,7 +478,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd vs-cas
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build edgefixer
@@ -389,7 +486,7 @@ echo -e "\e[42m Build edgefixer \e[0m"
 git clone --recursive https://github.com/sekrit-twc/EdgeFixer --depth 1
 pushd EdgeFixer/EdgeFixer
 gcc -O3 -ffast-math -Wall $NATIVE -I. -I"$MYICPH/vapoursynth" -shared -o libedgefixer.so edgefixer.c vsplugin.c -lm
-sudo install libedgefixer.so $VSPLGPH
+install libedgefixer.so $VSPLGPH
 popd
 
 # build ctmf
@@ -398,7 +495,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-CTMF
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build adaptivegrain
@@ -406,7 +503,7 @@ echo -e "\e[42m Build adaptivegrain \e[0m"
 git clone https://git.kageru.moe/kageru/adaptivegrain --depth 1
 cd adaptivegrain
 RUSTFLAGS="-C target-cpu=$cpu --emit asm" cargo build --release --target=x86_64-pc-linux-gnu --locked
-sudo install target/x86_64-pc-linux-gnu/release/libadaptivegrain_rs.so $VSPLGPH
+install target/x86_64-pc-linux-gnu/release/libadaptivegrain_rs.so $VSPLGPH
 cd ..
 
 # build vs-tivtc
@@ -415,7 +512,7 @@ git clone --recursive https://github.com/dubhater/vapoursynth-tivtc --depth 1
 cd vapoursynth-tivtc
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libtivtc.so $VSPLGPH
+install build/libtivtc.so $VSPLGPH
 cd ..
 
 # build vivtc
@@ -424,7 +521,7 @@ git clone --recursive https://github.com/vapoursynth/vivtc --depth 1
 cd vivtc
 CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libvivtc.so $VSPLGPH
+install build/libvivtc.so $VSPLGPH
 cd ..
 
 # build eedi2
@@ -433,14 +530,14 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-EEDI2
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libeedi2.so $VSPLGPH
+install build/libeedi2.so $VSPLGPH
 cd ..
 
 # download eedi2cuda (https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA)
 echo -e "\e[42m Download eedi2cuda \e[0m"
 wget https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA/releases/download/240124/libEEDI2CUDA.7z
 7z x libEEDI2CUDA.7z
-sudo install libEEDI2CUDA.so $VSPLGPH
+install libEEDI2CUDA.so $VSPLGPH
 
 # build eedi3
 echo -e "\e[42m Build eedi3 \e[0m"
@@ -448,7 +545,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-EEDI3
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libeedi3m.so $VSPLGPH
+install build/libeedi3m.so $VSPLGPH
 cd ..
 
 # build sangnom
@@ -457,7 +554,7 @@ git clone --recursive https://github.com/dubhater/vapoursynth-sangnom --depth 1
 cd vapoursynth-sangnom
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libsangnom.so $VSPLGPH
+install build/libsangnom.so $VSPLGPH
 cd ..
 
 # build vs-miscfilters-obsolete
@@ -466,7 +563,7 @@ git clone --recursive https://github.com/vapoursynth/vs-miscfilters-obsolete --d
 cd vs-miscfilters-obsolete
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build ttempsmooth
@@ -475,7 +572,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-TTempSmooth
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build bwdif
@@ -484,7 +581,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-Bwdif
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build yadifmod
@@ -493,7 +590,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-Yadifmod
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build deblock
@@ -502,7 +599,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-Deblock
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build addgrain
@@ -511,18 +608,18 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-AddGrain
 CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build neo_fft3d
 echo -e "\e[42m Build neo_fft3d \e[0m"
-sudo cp $MYICPH/avisynth/*.h $MYICPH
-sudo cp -r $MYICPH/avisynth/avs $MYICPH
+cp $MYICPH/avisynth/*.h $MYICPH
+cp -r $MYICPH/avisynth/avs $MYICPH
 git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_FFT3D --depth 1
 cd neo_FFT3D
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --verbose
-sudo install build/libneo-fft3d.so $VSPLGPH
+install build/libneo-fft3d.so $VSPLGPH
 cd ..
 
 # build wwxd
@@ -530,7 +627,7 @@ echo -e "\e[42m Build wwxd \e[0m"
 git clone --recursive https://github.com/dubhater/vapoursynth-wwxd --depth 1
 cd vapoursynth-wwxd
 gcc -O3 -ffast-math -Wall -march=$cpu -I. -I"$MYICPH/vapoursynth" -fPIC -Wall -Wextra -Wno-unused-parameter -shared -o libwwxd.so src/wwxd.c src/detection.c -lm
-sudo install libwwxd.so $VSPLGPH
+install libwwxd.so $VSPLGPH
 cd ..
 
 # build awarpsharp2
@@ -539,7 +636,7 @@ git clone --recursive https://github.com/dubhater/vapoursynth-awarpsharp2 --dept
 cd vapoursynth-awarpsharp2
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libawarpsharp2.so $VSPLGPH
+install build/libawarpsharp2.so $VSPLGPH
 cd ..
 
 # build fluxsmooth
@@ -549,7 +646,7 @@ cd vapoursynth-fluxsmooth
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo install .libs/libfluxsmooth.* $VSPLGPH
+install .libs/libfluxsmooth.* $VSPLGPH
 cd ..
 
 # build neo_f3kdb
@@ -558,7 +655,7 @@ git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_f3kdb.g
 cd neo_f3kdb
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release --verbose -j $(nproc)
-sudo install build/libneo-f3kdb.so $VSPLGPH
+install build/libneo-f3kdb.so $VSPLGPH
 cd ..
 
 # build nnedi3
@@ -568,8 +665,8 @@ cd vapoursynth-nnedi3
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
-sudo install .libs/libnnedi3* $VSPLGPH
-sudo install src/nnedi3_weights.bin $VSPLGPH
+install .libs/libnnedi3* $VSPLGPH
+install src/nnedi3_weights.bin $VSPLGPH
 cd ..
 
 # build znedi3
@@ -577,7 +674,7 @@ echo -e "\e[42m Build znedi3 \e[0m"
 git clone --recursive https://github.com/sekrit-twc/znedi3 --depth 1
 cd znedi3
 CFLAGS=$NATIVE CXXFLAGS=$NATIVE make X86=1 -j$(nproc)
-sudo install vsznedi3.so $VSPLGPH
+install vsznedi3.so $VSPLGPH
 cd ..
 
 # build nnedi3cl
@@ -586,7 +683,7 @@ git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-
 cd VapourSynth-NNEDI3CL
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build rgfs
@@ -594,16 +691,14 @@ echo -e "\e[42m Build rgfs \e[0m"
 git clone --recursive https://github.com/IFeelBloated/RGSF --depth 1
 cd RGSF
 g++ -Wall -shared -o librgsf.so *.cpp -O3 -march=$cpu
-sudo install librgsf.so $VSPLGPH
+install librgsf.so $VSPLGPH
 cd ..
 
-# build assrender
-echo -e "\e[42m Build assrender \e[0m"
-git clone --recursive https://github.com/AmusementClub/assrender --depth 1
-cd assrender
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-sudo cmake --install build --prefix $OWN_PREFIX
+# install assrender
+echo -e "\e[42m Install assrender \e[0m"
+wget https://github.com/kskshaf/assrender/releases/download/custom/assrender_linux-x64_100f77d.zip
+7z x assrender_linux-x64_100f77d.zip
+install libassrender.so $VSPLGPH
 cd ..
 
 # build vs-imwri
@@ -612,7 +707,7 @@ git clone --recursive https://github.com/vapoursynth/vs-imwri --depth 1
 cd vs-imwri
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo install build/libimwri.so $VSPLGPH
+install build/libimwri.so $VSPLGPH
 cd ..
 
 # build vfrtocrf
@@ -621,7 +716,7 @@ git clone --recursive https://github.com/Irrational-Encoding-Wizardry/Vapoursynt
 cd Vapoursynth-VFRToCFR
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build vs-compareplane
@@ -630,7 +725,7 @@ git clone --recursive https://github.com/AmusementClub/vs-compareplane --depth 1
 cd vs-compareplane
 PKG_CONFIG_PATH=$MYPKGPH CXX=clang++ CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
-sudo ninja -C build install
+ninja -C build install
 cd ..
 
 # build vs-hqdn3d
@@ -640,7 +735,7 @@ cd vapoursynth-hqdn3d
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure
 make -j$(nproc)
-sudo install .libs/libhqdn3d* $VSPLGPH
+install .libs/libhqdn3d* $VSPLGPH
 cd ..
 
 
@@ -654,28 +749,27 @@ git clone https://github.com/jpsdr/x264 --depth 1
 cd x264
 ./configure --prefix=$OWN_PREFIX --extra-cflags="$NATIVE -mno-avx512f" --disable-interlaced --disable-opencl --enable-lto --enable-strip --disable-avs --disable-swscale --disable-lavf --disable-ffms --disable-avi-output --disable-gpac --disable-lsmash --disable-audio --disable-qtaac --disable-faac --disable-mp3 --disable-lavc
 make -j$(nproc)
-sudo install -m 775 ./x264 $OWN_PREFIX/bin
+install -m 775 ./x264 $OWN_PREFIX/bin
 cd ..
 
 # build x265-mod
-echo -e "\e[42m Build x265-mod \e[0m"
-git clone https://github.com/kskshaf/x265-mod
-cd x265-mod/build
-mkdir -p 10b 10b-pgo
+#echo -e "\e[42m Build x265-mod \e[0m"
+#git clone https://github.com/kskshaf/x265_mod.git --branch stable
+#cd x265_mod/build
+#mkdir -p 10b
 # build x265 10b
-cd 10b
-cmake -GNinja ../../source -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DUSE_MIMALLOC=OFF -DUSE_LTO=ON -DTARGET_CPU=$cpu -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DCMAKE_CXX_FLAGS="-fprofile-generate=profd -fprofile-update=atomic"
-ninja
-chmod +x x265
-./x265 -V
-cp -r profd ../10b-pgo
-# build x265 10b-pgo
-cd ../10b-pgo
-cmake -GNinja ../../source -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DUSE_MIMALLOC=OFF -DUSE_LTO=ON -DTARGET_CPU=$cpu -DCMAKE_ASM_NASM_FLAGS=-w-macro-params-legacy -DCMAKE_CXX_FLAGS="-fprofile-use=profd"
-ninja
-strip -s x265
-sudo install -m 775 ./x265 $OWN_PREFIX/bin
-cd $HOME
+#cd 10b
+#cmake -GNinja ../../source -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DUSE_LTO=ON -DTARGET_CPU=$cpu -DCMAKE_CXX_FLAGS="-fprofile-generate=profd -fprofile-update=atomic"
+#ninja
+#chmod +x x265
+#./x265 -V
+#ninja clean
+#cmake -GNinja ../../source -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DUSE_LTO=ON -DTARGET_CPU=$cpu -DCMAKE_CXX_FLAGS="-fprofile-use=profd"
+#ninja
+#strip -s x265
+#install -m 775 ./x265 $OWN_PREFIX/bin
+#ninja clean
+#cd $HOME
 
 # build vs-edit
 echo -e "\e[42m Build vs-edit \e[0m"
@@ -683,7 +777,7 @@ git clone https://github.com/YomikoR/VapourSynth-Editor --branch r19-mod-6.3 --d
 cd VapourSynth-Editor/pro
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" qmake6 -norecursive pro.pro CONFIG+=release
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" make -j$(nproc)
-sudo mv ../build/release-64bit-gcc $OWN_PREFIX/bin/vsedit
+mv ../build/release-64bit-gcc $OWN_PREFIX/bin/vsedit
 make clean
 
 cd $HOME

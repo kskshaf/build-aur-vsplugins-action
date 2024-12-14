@@ -37,7 +37,10 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 ##  frei0r
 ##  freetype
 ##  ladspa
+##  libjxl
+##  libass
 
+## NOTICE: remember to replace 'prefix=/usr' to 'prefix=$OWN_PREFIX', in .pc files.
 
 echo -e "\e[42m Install llvm15 pkg \e[0m"
 wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-15.0.7-1-x86_64.pkg.tar.zst
@@ -93,10 +96,10 @@ echo -e "\e[42m Build akarin \e[0m"
 git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
 cd akarin-plugin
 sed -i 's/true/false/' meson_options.txt
-LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
 mkdir -p $VSPLGPH
-install ./build/libakarin.so $VSPLGPH
+install ./build/libakarin.so $VSPLGPH/
 ninja -C build clean
 cd ..
 
@@ -146,7 +149,7 @@ cd ..
 echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
 git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
 pushd FFmpeg
-PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-debug --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
 make -j$(nproc)
 make install -j$(nproc)
 make clean
@@ -215,7 +218,28 @@ make install -j$(nproc)
 make clean
 popd
 
-# build ffmpeg 6.1.2
+# build libvpx for ffmpeg-ffms2
+echo -e "\e[42m Build libvpx for ffmpeg \e[0m"
+pushd libvpx/builds
+PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX \
+    --disable-docs \
+    --disable-examples \
+    --disable-avx512 \
+    --disable-unit-tests \
+    --enable-pic \
+    --enable-postproc \
+    --enable-runtime-cpu-detect \
+    --enable-shared \
+    --enable-vp8 \
+    --enable-vp9 \
+    --enable-vp9-highbitdepth \
+    --enable-vp9-temporal-denoising
+make -j$(nproc)
+make install -j$(nproc)
+make clean
+popd
+
+# build ffmpeg 6.1.2 for ffms2
 echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
 pushd FFmpeg
 make uninstall -j$(nproc)
@@ -224,71 +248,27 @@ pacman --noconfirm -S amf-headers frei0r ladspa libass
 git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
 pushd ffmpeg
 ./configure --prefix=$OWN_PREFIX \
-  --disable-debug --disable-static \
-  --disable-stripping \
-  --enable-amf \
-  --enable-avisynth \
-  --enable-cuda-llvm \
-  --enable-lto \
-  --enable-fontconfig \
-  --enable-frei0r \
-  --enable-gmp \
-  --enable-gnutls \
+  --disable-doc \
+  --disable-network \
+  --disable-debug \
+  --disable-avx512 \
+  --disable-avx512icl \
+  --disable-shared \
+  --disable-programs \
+  --enable-static \
+  --enable-avcodec \
+  --enable-avformat \
+  --enable-avdevice \
+  --enable-avfilter \
+  --enable-swresample \
+  --enable-swscale\
   --enable-gpl \
-  --enable-ladspa \
-  --enable-libaom \
-  --enable-libass \
-  --enable-libbluray \
-  --enable-libbs2b \
   --enable-libdav1d \
-  --enable-libdrm \
-  --enable-libfreetype \
-  --enable-libfribidi \
-  --enable-libgsm \
-  --enable-libharfbuzz \
-  --enable-libiec61883 \
-  --enable-libjack \
-  --enable-libjxl \
-  --enable-libmodplug \
-  --enable-libmp3lame \
-  --enable-libopencore_amrnb \
-  --enable-libopencore_amrwb \
-  --enable-libopenjpeg \
-  --enable-libopenmpt \
-  --enable-libopus \
-  --enable-libplacebo \
-  --enable-libpulse \
-  --enable-librav1e \
-  --enable-librsvg \
-  --enable-librubberband \
-  --enable-libsnappy \
-  --enable-libsoxr \
-  --enable-libspeex \
-  --enable-libsrt \
-  --enable-libssh \
-  --enable-libsvtav1 \
-  --enable-libtheora \
-  --enable-libv4l2 \
-  --enable-libvidstab \
-  --enable-libvmaf \
-  --enable-libvorbis \
-  --enable-libvpl \
   --enable-libvpx \
-  --enable-libwebp \
-  --enable-libx264 \
-  --enable-libx265 \
-  --enable-libxcb \
   --enable-libxml2 \
-  --enable-libxvid \
-  --enable-libzimg \
+  --enable-lzma \
   --enable-nvdec \
-  --enable-nvenc \
-  --enable-opencl \
-  --enable-opengl \
-  --enable-shared \
-  --enable-vapoursynth \
-  --enable-version3 \
-  --enable-vulkan
+  --enable-version3
 make -j$(nproc)
 make tools/qt-faststart
 make install -j$(nproc)
@@ -300,8 +280,8 @@ popd
 echo -e "\e[42m Build ffms2 \e[0m"
 git clone --recursive https://github.com/FFMS/ffms2.git --depth 1
 cd ffms2
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
+PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
+PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
 make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
 make install
 make clean
@@ -351,9 +331,10 @@ cd ..
 echo -e "\e[42m Build subtext \e[0m"
 git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
 cd subtext
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
 ninja -C build install
+ninja -C build clean
 cd ..
 
 # build bm3dcuda

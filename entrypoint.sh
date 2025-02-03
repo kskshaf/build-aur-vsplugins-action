@@ -39,6 +39,7 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 ##  ladspa
 ##  libjxl
 ##  libass
+##  llvm15, llvm15-libs, clang15, compiler-rt15
 
 ## NOTICE: remember to replace 'prefix=/usr' to 'prefix=$OWN_PREFIX', in .pc files.
 
@@ -96,7 +97,8 @@ echo -e "\e[42m Build akarin \e[0m"
 git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
 cd akarin-plugin
 sed -i 's/true/false/' meson_options.txt
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+#CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
 ninja -C build
 mkdir -p $VSPLGPH
 install ./build/libakarin.so $VSPLGPH/
@@ -239,15 +241,15 @@ make install -j$(nproc)
 make clean
 popd
 
-# build ffmpeg 6.1.2 for ffms2
+# build ffmpeg 6.1.2 static libs for ffms2
 echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
 pushd FFmpeg
 make uninstall -j$(nproc)
 popd
-pacman --noconfirm -S amf-headers frei0r ladspa libass
+#pacman --noconfirm -S amf-headers frei0r ladspa libass
 git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
 pushd ffmpeg
-./configure --prefix=$OWN_PREFIX \
+PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
   --disable-doc \
   --disable-network \
   --disable-debug \
@@ -270,9 +272,7 @@ pushd ffmpeg
   --enable-nvdec \
   --enable-version3
 make -j$(nproc)
-make tools/qt-faststart
 make install -j$(nproc)
-install -Dm 755 tools/qt-faststart $OWN_PREFIX/bin/
 make clean
 popd
 
@@ -286,6 +286,11 @@ make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
 make install
 make clean
 cd ..
+
+# uninstall ffmpeg build
+pushd ffmpeg
+make uninstall
+popd
 
 # build tcanny (don't use -march=native for build)
 echo -e "\e[42m Build tcanny \e[0m"

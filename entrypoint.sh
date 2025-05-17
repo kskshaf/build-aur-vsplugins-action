@@ -287,6 +287,7 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 
 # build ffms2
 echo -e "\e[42m Build ffms2 \e[0m"
+rm -rf ffms2
 git clone --recursive https://github.com/FFMS/ffms2.git
 cd ffms2
 git checkout 25cef14386fcaaa58ee547065deee8f6e82c56a2

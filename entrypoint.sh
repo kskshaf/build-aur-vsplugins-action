@@ -217,6 +217,9 @@ cd ..
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" cmake -S . -G Ninja -B build_vs -DENABLE_VULKAN=OFF -DBUILD_AVS_PLUGIN=OFF
 cmake --build build_vs --config Release -j$(nproc)
 cmake --install build_vs --prefix $OWN_PREFIX
+# uninstall FFmpeg
+cd FFmpeg
+make uninstall -j$(nproc)
 popd
 
 # build l-smash exec
@@ -295,11 +298,6 @@ make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
 make install
 make clean
 cd ..
-
-# uninstall ffmpeg build
-pushd ffmpeg
-make uninstall
-popd
 
 # build tcanny (don't use -march=native for build)
 echo -e "\e[42m Build tcanny \e[0m"

@@ -257,6 +257,7 @@ cd ..
 # build ffmpeg 6.1.2 static libs for ffms2
 echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
 #pacman --noconfirm -S amf-headers frei0r ladspa libass
+rm -rf ffmpeg
 git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
 pushd ffmpeg
 PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \

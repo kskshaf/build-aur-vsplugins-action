@@ -359,6 +359,7 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 
 # build bm3dcuda
 echo -e "\e[42m Build bm3dcuda \e[0m"
+rm -rf VapourSynth-BM3DCUDA
 git clone --recursive https://github.com/WolframRhodium/VapourSynth-BM3DCUDA --depth 1
 cd VapourSynth-BM3DCUDA
 PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"

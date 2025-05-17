@@ -500,11 +500,10 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 
 # build adaptivegrain
 echo -e "\e[42m Build adaptivegrain \e[0m"
-rm -rf adaptivegrain
-git clone https://github.com/kageru/adaptivegrain --depth 1
+#git clone https://github.com/kageru/adaptivegrain --depth 1
 cd adaptivegrain
-RUSTFLAGS="-C target-cpu=$cpu" cargo build --release
-install target/x86_64-pc-linux-gnu/release/libadaptivegrain_rs.so $VSPLGPH
+#RUSTFLAGS="-C target-cpu=$cpu" cargo build --release
+install target/release/libadaptivegrain_rs.so $VSPLGPH
 cd ..
 
 # build vs-tivtc

@@ -17,7 +17,9 @@ export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm --needed -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx libxml2 imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r-plugins ladspa
+pacman --noconfirm --needed -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs rust onetbb meson wget cmake yasm imagemagick openexr libtiff libheif libmfx libxml2 imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers \
+boost bzip2 brotli harfbuzz libpng frei0r-plugins freetype2 ladspa libjxl libass
+
 
 #echo -e "\e[42m Install yay \e[0m"
 #useradd -m -s /usr/bin/bash yay-build
@@ -33,9 +35,9 @@ pacman --noconfirm --needed -S nasm cuda cuda-tools clang compiler-rt llvm llvm-
 ##  bzip2
 ##  brotli
 ##  harfbuzz
-##  libpng16
+##  libpng
 ##  frei0r
-##  freetype
+##  freetype2
 ##  ladspa
 ##  libjxl
 ##  libass
@@ -285,66 +287,66 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # make clean
 # popd
 
-# build ffms2
-echo -e "\e[42m Build ffms2 \e[0m"
-rm -rf ffms2
-git clone --recursive https://github.com/FFMS/ffms2.git
-cd ffms2
-git checkout 25cef14386fcaaa58ee547065deee8f6e82c56a2
-PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
-PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
-make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
-make install
-make clean
-cd ..
-
-# uninstall ffmpeg build
-pushd ffmpeg
-make uninstall
-popd
-
-# build tcanny (don't use -march=native for build)
-echo -e "\e[42m Build tcanny \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-TCanny.git --depth 1
-cd VapourSynth-TCanny
-CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-ninja -C build clean
-cd ..
-
-# build vs-dfttest2
-echo -e "\e[42m Build dfttest2 \e[0m"
-git clone --recursive https://github.com/AmusementClub/vs-dfttest2.git --depth 1
-cd vs-dfttest2
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
-cmake --build build --config Release --verbose
-cmake --install build --prefix $OWN_PREFIX
-ninja -C build clean
-mv dfttest2.py $VSFUNCPH
-cd ..
-
-# build boxblur
-echo -e "\e[42m Build boxblur \e[0m"
-git clone --recursive https://github.com/AmusementClub/vs-boxblur.git --depth 1
-cd vs-boxblur
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -DCMAKE_INSTALL_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE="-ffast-math -Wall $NATIVE"
-cmake --build build
-cmake --install build --prefix $OWN_PREFIX
-cd ..
-
-# build vsrawsource
-echo -e "\e[42m Build vsrawsource \e[0m"
-git clone --recursive https://github.com/AmusementClub/vsrawsource.git --depth 1
-cd vsrawsource
-PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-ninja -C build clean
-cd ..
+# # build ffms2
+# echo -e "\e[42m Build ffms2 \e[0m"
+# git clone --recursive https://github.com/FFMS/ffms2.git
+# cd ffms2
+# git checkout 25cef14386fcaaa58ee547065deee8f6e82c56a2
+# PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
+# PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
+# make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
+# make install
+# make clean
+# cd ..
+#
+# # uninstall ffmpeg build
+# pushd ffmpeg
+# make uninstall
+# popd
+#
+# # build tcanny (don't use -march=native for build)
+# echo -e "\e[42m Build tcanny \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-TCanny.git --depth 1
+# cd VapourSynth-TCanny
+# CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# ninja -C build clean
+# cd ..
+#
+# # build vs-dfttest2
+# echo -e "\e[42m Build dfttest2 \e[0m"
+# git clone --recursive https://github.com/AmusementClub/vs-dfttest2.git --depth 1
+# cd vs-dfttest2
+# CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
+# cmake --build build --config Release --verbose
+# cmake --install build --prefix $OWN_PREFIX
+# ninja -C build clean
+# mv dfttest2.py $VSFUNCPH
+# cd ..
+#
+# # build boxblur
+# echo -e "\e[42m Build boxblur \e[0m"
+# git clone --recursive https://github.com/AmusementClub/vs-boxblur.git --depth 1
+# cd vs-boxblur
+# PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -DCMAKE_INSTALL_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE="-ffast-math -Wall $NATIVE"
+# cmake --build build
+# cmake --install build --prefix $OWN_PREFIX
+# cd ..
+#
+# # build vsrawsource
+# echo -e "\e[42m Build vsrawsource \e[0m"
+# git clone --recursive https://github.com/AmusementClub/vsrawsource.git --depth 1
+# cd vsrawsource
+# PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# ninja -C build clean
+# cd ..
 
 # build subtext
 echo -e "\e[42m Build subtext \e[0m"
+rm -rf subtext
 git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
 cd subtext
 PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" meson setup --prefix=$OWN_PREFIX build .

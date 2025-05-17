@@ -613,13 +613,13 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 #
 # build neo_fft3d
 echo -e "\e[42m Build neo_fft3d \e[0m"
-cp $MYICPH/avisynth/*.h $MYICPH
-cp -r $MYICPH/avisynth/avs $MYICPH
+#cp $MYICPH/avisynth/*.h $MYICPH
+#cp -r $MYICPH/avisynth/avs $MYICPH
 rm -rf neo_FFT3D
 git clone --recursive https://github.com/kskshaf/neo_FFT3D.git --depth 1
 cd neo_FFT3D
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --verbose
+cmake --build build --verbose -j$(nproc)
 install build/libneo-fft3d.so $VSPLGPH
 cd ..
 

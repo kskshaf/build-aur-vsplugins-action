@@ -255,37 +255,37 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # make clean
 # popd
 
-# # build ffmpeg 6.1.2 static libs for ffms2
-# echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
-# #pacman --noconfirm -S amf-headers frei0r ladspa libass
-# git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
-# pushd ffmpeg
-# PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
-#   --disable-doc \
-#   --disable-network \
-#   --disable-debug \
-#   --disable-avx512 \
-#   --disable-avx512icl \
-#   --disable-shared \
-#   --disable-programs \
-#   --enable-static \
-#   --enable-avcodec \
-#   --enable-avformat \
-#   --enable-avdevice \
-#   --enable-avfilter \
-#   --enable-swresample \
-#   --enable-swscale\
-#   --enable-gpl \
-#   --enable-libdav1d \
-#   --enable-libvpx \
-#   --enable-libxml2 \
-#   --enable-lzma \
-#   --enable-nvdec \
-#   --enable-version3
-# make -j$(nproc)
-# make install -j$(nproc)
-# make clean
-# popd
+# build ffmpeg 6.1.2 static libs for ffms2
+echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
+#pacman --noconfirm -S amf-headers frei0r ladspa libass
+#git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
+pushd ffmpeg
+PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
+  --disable-doc \
+  --disable-network \
+  --disable-debug \
+  --disable-avx512 \
+  --disable-avx512icl \
+  --disable-shared \
+  --disable-programs \
+  --enable-static \
+  --enable-avcodec \
+  --enable-avformat \
+  --enable-avdevice \
+  --enable-avfilter \
+  --enable-swresample \
+  --enable-swscale\
+  --enable-gpl \
+  --enable-libdav1d \
+  --enable-libvpx \
+  --enable-libxml2 \
+  --enable-lzma \
+  --enable-nvdec \
+  --enable-version3
+make -j$(nproc)
+make install -j$(nproc)
+make clean
+popd
 
 # # build ffms2
 # echo -e "\e[42m Build ffms2 \e[0m"
@@ -299,10 +299,6 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # make clean
 # cd ..
 #
-# # uninstall ffmpeg build
-# pushd ffmpeg
-# make uninstall
-# popd
 #
 # # build tcanny (don't use -march=native for build)
 # echo -e "\e[42m Build tcanny \e[0m"
@@ -354,6 +350,11 @@ ninja -C build
 ninja -C build install
 ninja -C build clean
 cd ..
+
+# uninstall ffmpeg build
+pushd ffmpeg
+make uninstall
+popd
 
 # build bm3dcuda
 echo -e "\e[42m Build bm3dcuda \e[0m"

@@ -254,9 +254,6 @@ popd
 
 # build ffmpeg 6.1.2 static libs for ffms2
 echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
-pushd FFmpeg
-make uninstall -j$(nproc)
-popd
 #pacman --noconfirm -S amf-headers frei0r ladspa libass
 git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
 pushd ffmpeg
@@ -298,6 +295,11 @@ make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
 make install
 make clean
 cd ..
+
+# uninstall ffmpeg build
+pushd ffmpeg
+make uninstall
+popd
 
 # build tcanny (don't use -march=native for build)
 echo -e "\e[42m Build tcanny \e[0m"

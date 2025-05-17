@@ -44,10 +44,10 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 ## NOTICE: remember to replace 'prefix=/usr' to 'prefix=$OWN_PREFIX', in .pc files.
 
 echo -e "\e[42m Install llvm15 pkg \e[0m"
-wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-15.0.7-1-x86_64.pkg.tar.zst
-wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst
-wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/clang15-15.0.7-2-x86_64.pkg.tar.zst
-wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
+# wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-15.0.7-1-x86_64.pkg.tar.zst
+# wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst
+# wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/clang15-15.0.7-2-x86_64.pkg.tar.zst
+# wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
 pacman --noconfirm -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
@@ -55,7 +55,7 @@ echo -e "\e[42m Build custom python \e[0m"
 wget -c https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
 tar xf Python-3.12.10.tar.xz
 cd Python-3.12.10
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log # --with-lto
 make -j$(nproc) &> $OWN_PREFIX/python312_10_make.log
 make altinstall &> $OWN_PREFIX/python312_10_install.log
 make clean -j$(nproc)
@@ -92,18 +92,18 @@ popd
 make clean -j$(nproc)
 cd ..
 
-# build akarin
-echo -e "\e[42m Build akarin \e[0m"
-git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
-cd akarin-plugin
-sed -i 's/true/false/' meson_options.txt
-#CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-mkdir -p $VSPLGPH
-install ./build/libakarin.so $VSPLGPH/
-ninja -C build clean
-cd ..
+# # build akarin
+# echo -e "\e[42m Build akarin \e[0m"
+# git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
+# cd akarin-plugin
+# sed -i 's/true/false/' meson_options.txt
+# #CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# mkdir -p $VSPLGPH
+# install ./build/libakarin.so $VSPLGPH/
+# ninja -C build clean
+# cd ..
 
 # build dav1d
 echo -e "\e[42m Build dav1d \e[0m"

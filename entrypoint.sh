@@ -17,7 +17,7 @@ export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r-plugins ladspa
+pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx libxml2 imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r-plugins ladspa
 
 #echo -e "\e[42m Install yay \e[0m"
 #useradd -m -s /usr/bin/bash yay-build
@@ -55,9 +55,9 @@ echo -e "\e[42m Build custom python \e[0m"
 wget -c https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
 tar xf Python-3.12.10.tar.xz
 cd Python-3.12.10
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python312_10_conf.log
-make -j$(nproc) > $OWN_PREFIX/python312_10_make.log
-make altinstall > $OWN_PREFIX/python312_10_install.log
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log
+make -j$(nproc) &> $OWN_PREFIX/python312_10_make.log
+make altinstall &> $OWN_PREFIX/python312_10_install.log
 make clean -j$(nproc)
 cd ..
 export PATH="$OWN_PREFIX/bin:$PATH"

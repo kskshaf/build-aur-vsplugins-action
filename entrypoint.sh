@@ -8,8 +8,8 @@ export MYLDPH="$OWN_PREFIX/lib"
 export MYICPH="$OWN_PREFIX/include"
 export MYPKGPH="$MYLDPH/pkgconfig"
 export VSPLGPH="$MYLDPH/vapoursynth"
-export VSFUNCPH="$MYLDPH/python3.11/site-packages"
-export cpu=skylake
+export VSFUNCPH="$MYLDPH/python3.12/site-packages"
+export cpu=native
 export NATIVE="-march=$cpu -mtune=$cpu"
 
 export CUDA_PATH=/opt/cuda
@@ -17,7 +17,7 @@ export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif imath qt6-base qt6-websockets qt6-5compat p7zip
+pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r ladspa
 
 #echo -e "\e[42m Install yay \e[0m"
 #useradd -m -s /usr/bin/bash yay-build
@@ -52,12 +52,12 @@ wget -q https://github.com/kskshaf/build-aur-llvm15/releases/download/new/compil
 pacman --noconfirm -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
 echo -e "\e[42m Build custom python \e[0m"
-wget -c https://www.python.org/ftp/python/3.11.10/Python-3.11.10.tar.xz
-tar xf Python-3.11.10.tar.xz
-cd Python-3.11.10
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python311_10_conf.log
-make -j$(nproc) > $OWN_PREFIX/python311_10_make.log
-make altinstall > $OWN_PREFIX/python311_10_install.log
+wget -c https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
+tar xf Python-3.12.10.tar.xz
+cd Python-3.12.10
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --with-lto --prefix=$OWN_PREFIX > $OWN_PREFIX/python312_10_conf.log
+make -j$(nproc) > $OWN_PREFIX/python312_10_make.log
+make altinstall > $OWN_PREFIX/python312_10_install.log
 make clean -j$(nproc)
 cd ..
 export PATH="$OWN_PREFIX/bin:$PATH"
@@ -76,18 +76,18 @@ cd ..
 
 # build vapoursynth
 echo -e "\e[42m Build vapoursynth \e[0m"
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.11 -m pip install -U pip
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/pip3.11 install -U cython setuptools wheel pypng zstandard fonttools
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 -m pip install -U pip
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/pip3.12 install -U cython setuptools wheel pypng zstandard fonttools
 git clone --recursive https://github.com/vapoursynth/vapoursynth.git
 cd vapoursynth
-git checkout 329ca497b17c324eac701aa1b20652e558e5d281
+git checkout 40608b5552b035a8599e0a5fe57272287f9cf640   # R71
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
 PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
 make -j$(nproc)
 make install -j$(nproc)
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.11 setup.py sdist -d sdist
+PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 setup.py sdist -d sdist
 mkdir -p empty && pushd empty
-PYTHONUSERBASE=$OWN_PREFIX PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.11 install vapoursynth --no-index --find-links ../sdist
+PYTHONUSERBASE=$OWN_PREFIX PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.12 install vapoursynth --no-index --find-links ../sdist
 popd
 make clean -j$(nproc)
 cd ..
@@ -107,7 +107,7 @@ cd ..
 
 # build dav1d
 echo -e "\e[42m Build dav1d \e[0m"
-git clone https://code.videolan.org/videolan/dav1d.git --branch 1.4.3 --depth 1
+git clone https://code.videolan.org/videolan/dav1d.git --branch 1.5.1 --depth 1
 pushd dav1d
 mkdir build && cd build
 meson setup --prefix=$OWN_PREFIX -Denable_tools=false -Denable_tests=false --default-library=static --buildtype release . ..
@@ -126,7 +126,7 @@ cd ..
 
 # build libvpx
 echo -e "\e[42m Build libvpx \e[0m"
-git clone --recursive https://github.com/webmproject/libvpx.git --branch v1.14.1 --depth 1
+git clone --recursive https://github.com/webmproject/libvpx.git --branch v1.15.1 --depth 1
 mkdir libvpx/builds && pushd libvpx/builds
 PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX --as=nasm --enable-vp9-highbitdepth --disable-docs --disable-tools --disable-examples --disable-webm-io --disable-vp8-encoder --disable-vp9-encoder
 make -j$(nproc)
@@ -136,7 +136,7 @@ popd
 
 # build libxml2
 echo -e "\e[42m Build libxml2 \e[0m"
-git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.12.9 --depth 1
+git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.14.2 --depth 1
 cd libxml2
 PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./autogen.sh
 CFLAGS='-O2 -fno-semantic-interposition' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX
@@ -147,15 +147,15 @@ cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2s.pc
 make clean
 cd ..
 
-# build ffmpeg for lsmashsource
-echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
-git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
-pushd FFmpeg
-PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
+# # build ffmpeg for lsmashsource
+# echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
+# git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
+# pushd FFmpeg
+# PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# popd
 
 # build obuparse
 echo -e "\e[42m Build obuparse \e[0m"
@@ -181,15 +181,15 @@ make install-lib -j$(nproc)
 make clean
 popd
 
-# build xxHash
-echo -e "\e[42m Build xxHash \e[0m"
-git clone --recursive https://github.com/Cyan4973/xxHash --branch v0.8.2 --depth 1
-pushd xxHash
-cmake -S ./cmake_unofficial -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DXXHASH_BUILD_XXHSUM=OFF -DBUILD_SHARED_LIBS=OFF
-cmake --build build
-cmake --install build --prefix $OWN_PREFIX
-ninja -C build clean
-popd
+# # build xxHash
+# echo -e "\e[42m Build xxHash \e[0m"
+# git clone --recursive https://github.com/Cyan4973/xxHash --branch v0.8.2 --depth 1
+# pushd xxHash
+# cmake -S ./cmake_unofficial -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DXXHASH_BUILD_XXHSUM=OFF -DBUILD_SHARED_LIBS=OFF
+# cmake --build build
+# cmake --install build --prefix $OWN_PREFIX
+# ninja -C build clean
+# popd
 
 # build avisynth
 echo -e "\e[42m Build AviSynth \e[0m"
@@ -204,11 +204,18 @@ popd
 # build l-smash-works
 echo -e "\e[42m Build L-SMASH-Works \e[0m"
 git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/L-SMASH-Works --depth 1
-pushd L-SMASH-Works/VapourSynth
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-ninja -C build clean
+pushd L-SMASH-Works
+cd FFmpeg
+PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+make -j$(nproc)
+make install -j$(nproc)
+make clean
+#cd ../VapourSynth
+#PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" meson setup --prefix=$OWN_PREFIX build .
+cd ..
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" cmake -S . -G Ninja -B build_vs -DENABLE_VULKAN=OFF -DBUILD_AVS_PLUGIN=OFF
+cmake --build build_vs --config Release -j$(nproc)
+cmake --install build_vs --prefix $OWN_PREFIX
 popd
 
 # build l-smash exec
@@ -280,6 +287,7 @@ popd
 echo -e "\e[42m Build ffms2 \e[0m"
 git clone --recursive https://github.com/FFMS/ffms2.git --depth 1
 cd ffms2
+git checkout 25cef14386fcaaa58ee547065deee8f6e82c56a2
 PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX
 PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./configure --prefix=$OWN_PREFIX
 make V=1 CXXFLAGS='-Werror -Wno-error=deprecated-declarations' -j$(nproc) -k
@@ -306,7 +314,7 @@ cd ..
 echo -e "\e[42m Build dfttest2 \e[0m"
 git clone --recursive https://github.com/AmusementClub/vs-dfttest2.git --depth 1
 cd vs-dfttest2
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
+CFLAGS=$NATIVE CXXFLAGS=$NATIVE PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DVS_INCLUDE_DIR="$MYICPH/vapoursynth" -DENABLE_CUDA=ON -DUSE_NVRTC_STATIC=ON -DENABLE_CPU=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_CXX_FLAGS="-Wall -ffast-math"
 cmake --build build --config Release --verbose
 cmake --install build --prefix $OWN_PREFIX
 ninja -C build clean
@@ -346,7 +354,7 @@ cd ..
 echo -e "\e[42m Build bm3dcuda \e[0m"
 git clone --recursive https://github.com/WolframRhodium/VapourSynth-BM3DCUDA --depth 1
 cd VapourSynth-BM3DCUDA
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real"
+PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
 cmake --build build --verbose
 cmake --install build --prefix $OWN_PREFIX
 mv $OWN_PREFIX/lib/libbm3d* $VSPLGPH
@@ -415,7 +423,7 @@ cd ..
 echo -e "\e[42m Build knlm-cuda \e[0m"
 git clone --recursive https://github.com/AmusementClub/vs-nlm-cuda --depth 1
 cd vs-nlm-cuda
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -D VS_INCLUDE_DIR="$MYICPH/vapoursynth" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -ffast-math" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real"
+PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -D VS_INCLUDE_DIR="$MYICPH/vapoursynth" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -ffast-math" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
 cmake --build build --config Release --verbose
 cmake --install build --prefix $OWN_PREFIX
 cd ..
@@ -452,7 +460,7 @@ cd ..
 echo -e "\e[42m Build BilateralGPU \e[0m"
 git clone --recursive https://github.com/WolframRhodium/VapourSynth-BilateralGPU --depth 1
 cd VapourSynth-BilateralGPU
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -LA -DCMAKE_BUILD_TYPE=Release -DUSE_NVRTC_STATIC=ON -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math -march=$cpu" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;75-real;86-real;89-real"
+PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -LA -DCMAKE_BUILD_TYPE=Release -DUSE_NVRTC_STATIC=ON -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math -march=$cpu" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
 cmake --build build --verbose
 cmake --install build --prefix $OWN_PREFIX
 mv $OWN_PREFIX/lib/libbilateralgpu* $VSPLGPH
@@ -486,7 +494,7 @@ cd ..
 
 # build adaptivegrain
 echo -e "\e[42m Build adaptivegrain \e[0m"
-git clone https://git.kageru.moe/kageru/adaptivegrain --depth 1
+git clone https://github.com/kageru/adaptivegrain --depth 1
 cd adaptivegrain
 RUSTFLAGS="-C target-cpu=$cpu --emit asm" cargo build --release --target=x86_64-pc-linux-gnu --locked
 install target/x86_64-pc-linux-gnu/release/libadaptivegrain_rs.so $VSPLGPH
@@ -731,7 +739,7 @@ cd ..
 
 # build x264_mod
 echo -e "\e[42m Build x264_mod \e[0m"
-git clone https://github.com/jpsdr/x264 --depth 1
+git clone https://github.com/jpsdr/x264 --branch t_mod_New --depth 1
 cd x264
 ./configure --prefix=$OWN_PREFIX --extra-cflags="$NATIVE -mno-avx512f" --disable-interlaced --disable-opencl --enable-lto --enable-strip --disable-avs --disable-swscale --disable-lavf --disable-ffms --disable-avi-output --disable-gpac --disable-lsmash --disable-audio --disable-qtaac --disable-faac --disable-mp3 --disable-lavc
 make -j$(nproc)

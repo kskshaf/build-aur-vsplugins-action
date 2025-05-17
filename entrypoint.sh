@@ -17,7 +17,7 @@ export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r ladspa
+pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boost rust onetbb meson wget cmake yasm imagemagick openexr libtiff libjxl libheif libmfx imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers frei0r-plugins ladspa
 
 #echo -e "\e[42m Install yay \e[0m"
 #useradd -m -s /usr/bin/bash yay-build

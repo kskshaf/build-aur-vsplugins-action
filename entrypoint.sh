@@ -116,15 +116,14 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # ninja clean
 # popd
 #
-# install nv-codec-headers
-echo -e "\e[42m Install nv-codec-headers \e[0m"
-rm -rf nv-codec-headers
-git clone --recursive https://github.com/FFmpeg/nv-codec-headers --depth 1
-cd nv-codec-headers
-tmp=$(echo $OWN_PREFIX | sed 's#\/#\\\/#g')
-sed -i 's#/usr/local#'"${tmp}"'#g' Makefile
-make install -j$(nproc)
-cd ..
+# # install nv-codec-headers
+# echo -e "\e[42m Install nv-codec-headers \e[0m"
+# git clone --recursive https://github.com/FFmpeg/nv-codec-headers --depth 1
+# cd nv-codec-headers
+# tmp=$(echo $OWN_PREFIX | sed 's#\/#\\\/#g')
+# sed -i 's#/usr/local#'"${tmp}"'#g' Makefile
+# make install -j$(nproc)
+# cd ..
 #
 # # build libvpx
 # echo -e "\e[42m Build libvpx \e[0m"
@@ -254,42 +253,41 @@ cd ..
 # make clean
 # popd
 
-# build ffmpeg 6.1.2 static libs for ffms2
-echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
-#pacman --noconfirm -S amf-headers frei0r ladspa libass
-rm -rf ffmpeg
-git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
-pushd ffmpeg
-PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
-  --disable-doc \
-  --disable-network \
-  --disable-debug \
-  --disable-avx512 \
-  --disable-avx512icl \
-  --disable-shared \
-  --disable-programs \
-  --enable-static \
-  --enable-avcodec \
-  --enable-avformat \
-  --enable-avdevice \
-  --enable-avfilter \
-  --enable-swresample \
-  --enable-swscale\
-  --enable-gpl \
-  --enable-libdav1d \
-  --enable-libvpx \
-  --enable-libxml2 \
-  --enable-lzma \
-  --enable-nvdec \
-  --enable-version3
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
+# # build ffmpeg 6.1.2 static libs for ffms2
+# echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
+# #pacman --noconfirm -S amf-headers frei0r ladspa libass
+# git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
+# pushd ffmpeg
+# PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
+#   --disable-doc \
+#   --disable-network \
+#   --disable-debug \
+#   --disable-avx512 \
+#   --disable-avx512icl \
+#   --disable-shared \
+#   --disable-programs \
+#   --enable-static \
+#   --enable-avcodec \
+#   --enable-avformat \
+#   --enable-avdevice \
+#   --enable-avfilter \
+#   --enable-swresample \
+#   --enable-swscale\
+#   --enable-gpl \
+#   --enable-libdav1d \
+#   --enable-libvpx \
+#   --enable-libxml2 \
+#   --enable-lzma \
+#   --enable-nvdec \
+#   --enable-version3
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# popd
 
 # build ffms2
 echo -e "\e[42m Build ffms2 \e[0m"
-git clone --recursive https://github.com/FFMS/ffms2.git --depth 1
+git clone --recursive https://github.com/FFMS/ffms2.git
 cd ffms2
 git checkout 25cef14386fcaaa58ee547065deee8f6e82c56a2
 PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" ./autogen.sh --prefix=$OWN_PREFIX

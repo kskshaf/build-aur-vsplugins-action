@@ -2,9 +2,6 @@
 set -euo pipefail
 
 export HOME=$PWD
-# clean failed files
-rm -rf ./*
-
 mkdir -p $HOME/myenc
 export OWN_PREFIX="$HOME/myenc"
 export MYLDPH="$OWN_PREFIX/lib"
@@ -54,206 +51,208 @@ pacman --noconfirm --needed -S nasm cuda cuda-tools clang compiler-rt llvm llvm-
 
 # pacman --noconfirm -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
-echo -e "\e[42m Build custom python \e[0m"
-wget -q https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
-tar xf Python-3.12.10.tar.xz
-cd Python-3.12.10
-CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log # --with-lto
-make -j$(nproc) &> $OWN_PREFIX/python312_10_make.log
-make altinstall &> $OWN_PREFIX/python312_10_install.log
-make clean -j$(nproc)
-cd ..
+# echo -e "\e[42m Build custom python \e[0m"
+# wget -q https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
+# tar xf Python-3.12.10.tar.xz
+# cd Python-3.12.10
+# CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log # --with-lto
+# make -j$(nproc) &> $OWN_PREFIX/python312_10_make.log
+# make altinstall &> $OWN_PREFIX/python312_10_install.log
+# make clean -j$(nproc)
+# cd ..
 export PATH="$OWN_PREFIX/bin:$PATH"
 
-# build zimg
-echo -e "\e[42m Build zimg \e[0m"
-git clone https://github.com/sekrit-twc/zimg.git --depth 1 --recurse-submodules --shallow-submodules
-cd zimg
-#git checkout 71431815950664f1e11b9ee4e5d4ba23d6d997f1
-PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
-PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
-make -j$(nproc)
-make install -j$(nproc)
-make clean -j$(nproc)
-cd ..
-
-# build vapoursynth
-echo -e "\e[42m Build vapoursynth \e[0m"
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 -m pip install -U pip
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/pip3.12 install -U cython setuptools wheel pypng zstandard fonttools
-git clone --recursive https://github.com/vapoursynth/vapoursynth.git
-cd vapoursynth
-git checkout 40608b5552b035a8599e0a5fe57272287f9cf640   # R71
-PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
-PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
-make -j$(nproc)
-make install -j$(nproc)
-PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 setup.py sdist -d sdist
-mkdir -p empty && pushd empty
-PYTHONUSERBASE=$OWN_PREFIX PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.12 install vapoursynth --no-index --find-links ../sdist
-popd
-make clean -j$(nproc)
-cd ..
-
-# # build akarin
-# echo -e "\e[42m Build akarin \e[0m"
-# git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
-# cd akarin-plugin
-# sed -i 's/true/false/' meson_options.txt
-# #CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-# CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-# ninja -C build
-# mkdir -p $VSPLGPH
-# install ./build/libakarin.so $VSPLGPH/
-# ninja -C build clean
+# # build zimg
+# echo -e "\e[42m Build zimg \e[0m"
+# git clone https://github.com/sekrit-twc/zimg.git --depth 1 --recurse-submodules --shallow-submodules
+# cd zimg
+# #git checkout 71431815950664f1e11b9ee4e5d4ba23d6d997f1
+# PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
+# PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean -j$(nproc)
 # cd ..
-
-# build dav1d
-echo -e "\e[42m Build dav1d \e[0m"
-git clone https://code.videolan.org/videolan/dav1d.git --branch 1.5.1 --depth 1
-pushd dav1d
-mkdir build && cd build
-meson setup --prefix=$OWN_PREFIX -Denable_tools=false -Denable_tests=false --default-library=static --buildtype release . ..
-ninja
-ninja install
-ninja clean
-popd
-
+#
+# # build vapoursynth
+# echo -e "\e[42m Build vapoursynth \e[0m"
+# PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 -m pip install -U pip
+# PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/pip3.12 install -U cython setuptools wheel pypng zstandard fonttools
+# git clone --recursive https://github.com/vapoursynth/vapoursynth.git
+# cd vapoursynth
+# git checkout 40608b5552b035a8599e0a5fe57272287f9cf640   # R71
+# PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
+# PKG_CONFIG_PATH=$MYPKGPH PREFIX=$OWN_PREFIX CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+# make -j$(nproc)
+# make install -j$(nproc)
+# PYTHONUSERBASE=$OWN_PREFIX $OWN_PREFIX/bin/python3.12 setup.py sdist -d sdist
+# mkdir -p empty && pushd empty
+# PYTHONUSERBASE=$OWN_PREFIX PKG_CONFIG_PATH=$MYPKGPH LDFLAGS=-L$OWN_PREFIX/lib $OWN_PREFIX/bin/pip3.12 install vapoursynth --no-index --find-links ../sdist
+# popd
+# make clean -j$(nproc)
+# cd ..
+#
+# # # build akarin
+# # echo -e "\e[42m Build akarin \e[0m"
+# # git clone --recursive https://github.com/AkarinVS/vapoursynth-plugin.git --depth 1 akarin-plugin
+# # cd akarin-plugin
+# # sed -i 's/true/false/' meson_options.txt
+# # #CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=$OWN_PREFIX/lib/llvm15/bin/llvm-config CC=$OWN_PREFIX/lib/llvm15/bin/clang-15 CXX=$OWN_PREFIX/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# # CFLAGS=$NATIVE CXXFLAGS=$NATIVE LLVM_CONFIG=/usr/lib/llvm15/bin/llvm-config CC=/usr/lib/llvm15/bin/clang-15 CXX=/usr/lib/llvm15/bin/clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# # ninja -C build
+# # mkdir -p $VSPLGPH
+# # install ./build/libakarin.so $VSPLGPH/
+# # ninja -C build clean
+# # cd ..
+#
+# # build dav1d
+# echo -e "\e[42m Build dav1d \e[0m"
+# git clone https://code.videolan.org/videolan/dav1d.git --branch 1.5.1 --depth 1
+# pushd dav1d
+# mkdir build && cd build
+# meson setup --prefix=$OWN_PREFIX -Denable_tools=false -Denable_tests=false --default-library=static --buildtype release . ..
+# ninja
+# ninja install
+# ninja clean
+# popd
+#
 # install nv-codec-headers
 echo -e "\e[42m Install nv-codec-headers \e[0m"
+rm -rf nv-codec-headers
 git clone --recursive https://github.com/FFmpeg/nv-codec-headers --depth 1
 cd nv-codec-headers
-#sed -i 's/\/usr\/local/$OWN_PREFIX/' Makefile
+tmp=$(echo $OWN_PREFIX | sed 's#\/#\\\/#g')
+sed -i 's#/usr/local#'"${tmp}"'/g' Makefile
 make install -j$(nproc)
 cd ..
-
-# build libvpx
-echo -e "\e[42m Build libvpx \e[0m"
-git clone --recursive https://github.com/webmproject/libvpx.git --branch v1.15.1 --depth 1
-mkdir libvpx/builds && pushd libvpx/builds
-PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX --as=nasm --enable-vp9-highbitdepth --disable-docs --disable-tools --disable-examples --disable-webm-io --disable-vp8-encoder --disable-vp9-encoder
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
-
-# build libxml2
-echo -e "\e[42m Build libxml2 \e[0m"
-git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.14.2 --depth 1
-cd libxml2
-PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./autogen.sh
-CFLAGS='-O2 -fno-semantic-interposition' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX
-make -j$(nproc)
-make install -j$(nproc)
-cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2.pc
-cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2s.pc
-make clean
-cd ..
-
-# # build ffmpeg for lsmashsource
-# echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
-# git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
-# pushd FFmpeg
-# PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+#
+# # build libvpx
+# echo -e "\e[42m Build libvpx \e[0m"
+# git clone --recursive https://github.com/webmproject/libvpx.git --branch v1.15.1 --depth 1
+# mkdir libvpx/builds && pushd libvpx/builds
+# PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX --as=nasm --enable-vp9-highbitdepth --disable-docs --disable-tools --disable-examples --disable-webm-io --disable-vp8-encoder --disable-vp9-encoder
 # make -j$(nproc)
 # make install -j$(nproc)
 # make clean
 # popd
-
-# build obuparse
-echo -e "\e[42m Build obuparse \e[0m"
-git clone --recursive https://github.com/dwbuiten/obuparse --depth 1
-pushd obuparse
-# gcc -O2 -c obuparse.c
-# ar r libobuparse.a obuparse.o
-# install obuparse.h $MYICPH
-# install libobuparse.a $MYLDPH
-# rm -rf *.a *.o
-PREFIX=$OWN_PREFIX make -j$(nproc) && make install -j$(nproc)
-popd
-
-# build l-smash static-libs
-echo -e "\e[42m Build l-smash static-libs \e[0m"
-git clone --recursive https://github.com/kskshaf/l-smash --depth 1
-pushd l-smash
-mv configure configure.old
-sed 's/-Wl,--version-script,liblsmash.ver//g' configure.old >configure
-chmod +x configure
-./configure --prefix=$OWN_PREFIX --extra-cflags="-I$MYICPH -fPIC"  --extra-ldflags=-L$MYLDPH
-make static-lib -j$(nproc)
-make install-lib -j$(nproc)
-make clean
-popd
-
-# # build xxHash
-# echo -e "\e[42m Build xxHash \e[0m"
-# git clone --recursive https://github.com/Cyan4973/xxHash --branch v0.8.2 --depth 1
-# pushd xxHash
-# cmake -S ./cmake_unofficial -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DXXHASH_BUILD_XXHSUM=OFF -DBUILD_SHARED_LIBS=OFF
+#
+# # build libxml2
+# echo -e "\e[42m Build libxml2 \e[0m"
+# git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.14.2 --depth 1
+# cd libxml2
+# PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./autogen.sh
+# CFLAGS='-O2 -fno-semantic-interposition' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX
+# make -j$(nproc)
+# make install -j$(nproc)
+# cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2.pc
+# cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2s.pc
+# make clean
+# cd ..
+#
+# # # build ffmpeg for lsmashsource
+# # echo -e "\e[42m Build ffmpeg for lsmashsource \e[0m"
+# # git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/FFmpeg --branch custom-patches-for-lsmashsource --depth 1
+# # pushd FFmpeg
+# # PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+# # make -j$(nproc)
+# # make install -j$(nproc)
+# # make clean
+# # popd
+#
+# # build obuparse
+# echo -e "\e[42m Build obuparse \e[0m"
+# git clone --recursive https://github.com/dwbuiten/obuparse --depth 1
+# pushd obuparse
+# # gcc -O2 -c obuparse.c
+# # ar r libobuparse.a obuparse.o
+# # install obuparse.h $MYICPH
+# # install libobuparse.a $MYLDPH
+# # rm -rf *.a *.o
+# PREFIX=$OWN_PREFIX make -j$(nproc) && make install -j$(nproc)
+# popd
+#
+# # build l-smash static-libs
+# echo -e "\e[42m Build l-smash static-libs \e[0m"
+# git clone --recursive https://github.com/kskshaf/l-smash --depth 1
+# pushd l-smash
+# mv configure configure.old
+# sed 's/-Wl,--version-script,liblsmash.ver//g' configure.old >configure
+# chmod +x configure
+# ./configure --prefix=$OWN_PREFIX --extra-cflags="-I$MYICPH -fPIC"  --extra-ldflags=-L$MYLDPH
+# make static-lib -j$(nproc)
+# make install-lib -j$(nproc)
+# make clean
+# popd
+#
+# # # build xxHash
+# # echo -e "\e[42m Build xxHash \e[0m"
+# # git clone --recursive https://github.com/Cyan4973/xxHash --branch v0.8.2 --depth 1
+# # pushd xxHash
+# # cmake -S ./cmake_unofficial -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DXXHASH_BUILD_XXHSUM=OFF -DBUILD_SHARED_LIBS=OFF
+# # cmake --build build
+# # cmake --install build --prefix $OWN_PREFIX
+# # ninja -C build clean
+# # popd
+#
+# # build avisynth
+# echo -e "\e[42m Build AviSynth \e[0m"
+# git clone --recursive https://github.com/AviSynth/AviSynthPlus --branch 3.7 --depth 1
+# pushd AviSynthPlus
+# cmake -S . -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DENABLE_PLUGINS=OFF -DENABLE_INTEL_SIMD=OFF
 # cmake --build build
 # cmake --install build --prefix $OWN_PREFIX
 # ninja -C build clean
 # popd
-
-# build avisynth
-echo -e "\e[42m Build AviSynth \e[0m"
-git clone --recursive https://github.com/AviSynth/AviSynthPlus --branch 3.7 --depth 1
-pushd AviSynthPlus
-cmake -S . -B build -GNinja -DCMAKE_PREFIX_PATH=$OWN_PREFIX -DCMAKE_BUILD_TYPE=Release -DENABLE_PLUGINS=OFF -DENABLE_INTEL_SIMD=OFF
-cmake --build build
-cmake --install build --prefix $OWN_PREFIX
-ninja -C build clean
-popd
-
-# build l-smash-works
-echo -e "\e[42m Build L-SMASH-Works \e[0m"
-git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/L-SMASH-Works --depth 1
-pushd L-SMASH-Works
-cd FFmpeg
-PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-#cd ../VapourSynth
-#PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" meson setup --prefix=$OWN_PREFIX build .
-cd ..
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" cmake -S . -G Ninja -B build_vs -DENABLE_VULKAN=OFF -DBUILD_AVS_PLUGIN=OFF
-cmake --build build_vs --config Release -j$(nproc)
-cmake --install build_vs --prefix $OWN_PREFIX
-# uninstall FFmpeg
-cd FFmpeg
-make uninstall -j$(nproc)
-popd
-
-# build l-smash exec
-# muxer remuxer boxdumper timelineeditor
-echo -e "\e[42m Build l-smash exec \e[0m"
-pushd l-smash
-make all -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
-
-# build libvpx for ffmpeg-ffms2
-echo -e "\e[42m Build libvpx for ffmpeg \e[0m"
-pushd libvpx/builds
-PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX \
-    --disable-docs \
-    --disable-examples \
-    --disable-avx512 \
-    --disable-unit-tests \
-    --enable-pic \
-    --enable-postproc \
-    --enable-runtime-cpu-detect \
-    --enable-shared \
-    --enable-vp8 \
-    --enable-vp9 \
-    --enable-vp9-highbitdepth \
-    --enable-vp9-temporal-denoising
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
+#
+# # build l-smash-works
+# echo -e "\e[42m Build L-SMASH-Works \e[0m"
+# git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/L-SMASH-Works --depth 1
+# pushd L-SMASH-Works
+# cd FFmpeg
+# PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-gpl --enable-version3 --disable-debug --disable-hwaccels --disable-encoders --disable-avisynth --disable-doc --disable-network --disable-programs --disable-muxers --enable-avcodec --enable-avformat --enable-swresample --enable-swscale --enable-libdav1d --enable-libvpx --enable-libxml2
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# #cd ../VapourSynth
+# #PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" meson setup --prefix=$OWN_PREFIX build .
+# cd ..
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS="-I$OWN_PREFIX/include" CXXFLAGS="-I$OWN_PREFIX/include" LDFLAGS="-Wl,-Bsymbolic" cmake -S . -G Ninja -B build_vs -DENABLE_VULKAN=OFF -DBUILD_AVS_PLUGIN=OFF
+# cmake --build build_vs --config Release -j$(nproc)
+# cmake --install build_vs --prefix $OWN_PREFIX
+# # uninstall FFmpeg
+# cd FFmpeg
+# make uninstall -j$(nproc)
+# popd
+#
+# # build l-smash exec
+# # muxer remuxer boxdumper timelineeditor
+# echo -e "\e[42m Build l-smash exec \e[0m"
+# pushd l-smash
+# make all -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# popd
+#
+# # build libvpx for ffmpeg-ffms2
+# echo -e "\e[42m Build libvpx for ffmpeg \e[0m"
+# pushd libvpx/builds
+# PKG_CONFIG_PATH=$MYPKGPH ../configure --prefix=$OWN_PREFIX \
+#     --disable-docs \
+#     --disable-examples \
+#     --disable-avx512 \
+#     --disable-unit-tests \
+#     --enable-pic \
+#     --enable-postproc \
+#     --enable-runtime-cpu-detect \
+#     --enable-shared \
+#     --enable-vp8 \
+#     --enable-vp9 \
+#     --enable-vp9-highbitdepth \
+#     --enable-vp9-temporal-denoising
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# popd
 
 # build ffmpeg 6.1.2 static libs for ffms2
 echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"

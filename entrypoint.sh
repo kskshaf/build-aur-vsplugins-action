@@ -122,7 +122,7 @@ rm -rf nv-codec-headers
 git clone --recursive https://github.com/FFmpeg/nv-codec-headers --depth 1
 cd nv-codec-headers
 tmp=$(echo $OWN_PREFIX | sed 's#\/#\\\/#g')
-sed -i 's#/usr/local#'"${tmp}"'/g' Makefile
+sed -i 's#/usr/local#'"${tmp}"'#g' Makefile
 make install -j$(nproc)
 cd ..
 #

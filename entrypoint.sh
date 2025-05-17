@@ -611,48 +611,48 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # ninja -C build install
 # cd ..
 #
-# # build neo_fft3d
-# echo -e "\e[42m Build neo_fft3d \e[0m"
-# cp $MYICPH/avisynth/*.h $MYICPH
-# cp -r $MYICPH/avisynth/avs $MYICPH
-# git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_FFT3D --depth 1
-# cd neo_FFT3D
-# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-# cmake --build build --verbose
-# install build/libneo-fft3d.so $VSPLGPH
-# cd ..
-#
-# # build wwxd
-# echo -e "\e[42m Build wwxd \e[0m"
-# git clone --recursive https://github.com/dubhater/vapoursynth-wwxd --depth 1
-# cd vapoursynth-wwxd
-# gcc -O3 -ffast-math -Wall -march=$cpu -I. -I"$MYICPH/vapoursynth" -fPIC -Wall -Wextra -Wno-unused-parameter -shared -o libwwxd.so src/wwxd.c src/detection.c -lm
-# install libwwxd.so $VSPLGPH
-# cd ..
-#
-# # build awarpsharp2
-# echo -e "\e[42m Build awarpsharp2 \e[0m"
-# git clone --recursive https://github.com/dubhater/vapoursynth-awarpsharp2 --depth 1
-# cd vapoursynth-awarpsharp2
-# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-# ninja -C build
-# install build/libawarpsharp2.so $VSPLGPH
-# cd ..
-#
-# # build fluxsmooth
-# echo -e "\e[42m Build fluxsmooth \e[0m"
-# git clone --recursive https://github.com/dubhater/vapoursynth-fluxsmooth --depth 1
-# cd vapoursynth-fluxsmooth
-# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
-# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
-# make -j$(nproc)
-# install .libs/libfluxsmooth.* $VSPLGPH
-# cd ..
+# build neo_fft3d
+echo -e "\e[42m Build neo_fft3d \e[0m"
+cp $MYICPH/avisynth/*.h $MYICPH
+cp -r $MYICPH/avisynth/avs $MYICPH
+rm -rf neo_FFT3D
+git clone --recursive https://github.com/kskshaf/neo_FFT3D.git --depth 1
+cd neo_FFT3D
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --verbose
+install build/libneo-fft3d.so $VSPLGPH
+cd ..
+
+# build wwxd
+echo -e "\e[42m Build wwxd \e[0m"
+git clone --recursive https://github.com/dubhater/vapoursynth-wwxd --depth 1
+cd vapoursynth-wwxd
+gcc -O3 -ffast-math -Wall -march=$cpu -I. -I"$MYICPH/vapoursynth" -fPIC -Wall -Wextra -Wno-unused-parameter -shared -o libwwxd.so src/wwxd.c src/detection.c -lm
+install libwwxd.so $VSPLGPH
+cd ..
+
+# build awarpsharp2
+echo -e "\e[42m Build awarpsharp2 \e[0m"
+git clone --recursive https://github.com/dubhater/vapoursynth-awarpsharp2 --depth 1
+cd vapoursynth-awarpsharp2
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+ninja -C build
+install build/libawarpsharp2.so $VSPLGPH
+cd ..
+
+# build fluxsmooth
+echo -e "\e[42m Build fluxsmooth \e[0m"
+git clone --recursive https://github.com/dubhater/vapoursynth-fluxsmooth --depth 1
+cd vapoursynth-fluxsmooth
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
+PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+make -j$(nproc)
+install .libs/libfluxsmooth.* $VSPLGPH
+cd ..
 
 # build neo_f3kdb
 echo -e "\e[42m Build neo_f3kdb \e[0m"
-rm -rf neo_FFT3D
-git clone --recursive https://github.com/kskshaf/neo_FFT3D.git --depth 1
+git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_f3kdb.git --depth 1
 cd neo_f3kdb
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release --verbose -j $(nproc)

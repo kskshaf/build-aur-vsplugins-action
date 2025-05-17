@@ -498,160 +498,161 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # ninja -C build install
 # cd ..
 
-# build adaptivegrain
-echo -e "\e[42m Build adaptivegrain \e[0m"
-#git clone https://github.com/kageru/adaptivegrain --depth 1
-cd adaptivegrain
-#RUSTFLAGS="-C target-cpu=$cpu" cargo build --release
-install target/release/libadaptivegrain_rs.so $VSPLGPH
-cd ..
-
-# build vs-tivtc
-echo -e "\e[42m Build vs-tivtc \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-tivtc --depth 1
-cd vapoursynth-tivtc
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libtivtc.so $VSPLGPH
-cd ..
-
-# build vivtc
-echo -e "\e[42m Build vivtc \e[0m"
-git clone --recursive https://github.com/vapoursynth/vivtc --depth 1
-cd vivtc
-CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libvivtc.so $VSPLGPH
-cd ..
-
-# build eedi2
-echo -e "\e[42m Build EEDI2 \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-EEDI2 --depth 1
-cd VapourSynth-EEDI2
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libeedi2.so $VSPLGPH
-cd ..
-
-# download eedi2cuda (https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA)
-echo -e "\e[42m Download eedi2cuda \e[0m"
-wget https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA/releases/download/240124/libEEDI2CUDA.7z
-7z x libEEDI2CUDA.7z
-install libEEDI2CUDA.so $VSPLGPH
-
-# build eedi3
-echo -e "\e[42m Build eedi3 \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-EEDI3 --depth 1
-cd VapourSynth-EEDI3
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libeedi3m.so $VSPLGPH
-cd ..
-
-# build sangnom
-echo -e "\e[42m Build sangnom \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-sangnom --depth 1
-cd vapoursynth-sangnom
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libsangnom.so $VSPLGPH
-cd ..
-
-# build vs-miscfilters-obsolete
-echo -e "\e[42m Build vs-miscfilters-obsolete \e[0m"
-git clone --recursive https://github.com/vapoursynth/vs-miscfilters-obsolete --depth 1
-cd vs-miscfilters-obsolete
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build ttempsmooth
-echo -e "\e[42m Build ttempsmooth \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-TTempSmooth --depth 1
-cd VapourSynth-TTempSmooth
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build bwdif
-echo -e "\e[42m Build bwdif \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Bwdif --depth 1
-cd VapourSynth-Bwdif
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build yadifmod
-echo -e "\e[42m Build yadifmod \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Yadifmod --depth 1
-cd VapourSynth-Yadifmod
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build deblock
-echo -e "\e[42m Build deblock \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Deblock --depth 1
-cd VapourSynth-Deblock
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build addgrain
-echo -e "\e[42m Build AddGrain \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-AddGrain --depth 1
-cd VapourSynth-AddGrain
-CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build neo_fft3d
-echo -e "\e[42m Build neo_fft3d \e[0m"
-cp $MYICPH/avisynth/*.h $MYICPH
-cp -r $MYICPH/avisynth/avs $MYICPH
-git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_FFT3D --depth 1
-cd neo_FFT3D
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --verbose
-install build/libneo-fft3d.so $VSPLGPH
-cd ..
-
-# build wwxd
-echo -e "\e[42m Build wwxd \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-wwxd --depth 1
-cd vapoursynth-wwxd
-gcc -O3 -ffast-math -Wall -march=$cpu -I. -I"$MYICPH/vapoursynth" -fPIC -Wall -Wextra -Wno-unused-parameter -shared -o libwwxd.so src/wwxd.c src/detection.c -lm
-install libwwxd.so $VSPLGPH
-cd ..
-
-# build awarpsharp2
-echo -e "\e[42m Build awarpsharp2 \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-awarpsharp2 --depth 1
-cd vapoursynth-awarpsharp2
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-install build/libawarpsharp2.so $VSPLGPH
-cd ..
-
-# build fluxsmooth
-echo -e "\e[42m Build fluxsmooth \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-fluxsmooth --depth 1
-cd vapoursynth-fluxsmooth
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
-make -j$(nproc)
-install .libs/libfluxsmooth.* $VSPLGPH
-cd ..
+## build adaptivegrain
+# echo -e "\e[42m Build adaptivegrain \e[0m"
+# git clone https://github.com/kageru/adaptivegrain --depth 1
+# cd adaptivegrain
+# RUSTFLAGS="-C target-cpu=$cpu" cargo build --release
+# install target/release/libadaptivegrain_rs.so $VSPLGPH
+# cd ..
+#
+# # build vs-tivtc
+# echo -e "\e[42m Build vs-tivtc \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-tivtc --depth 1
+# cd vapoursynth-tivtc
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libtivtc.so $VSPLGPH
+# cd ..
+#
+# # build vivtc
+# echo -e "\e[42m Build vivtc \e[0m"
+# git clone --recursive https://github.com/vapoursynth/vivtc --depth 1
+# cd vivtc
+# CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libvivtc.so $VSPLGPH
+# cd ..
+#
+# # build eedi2
+# echo -e "\e[42m Build EEDI2 \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-EEDI2 --depth 1
+# cd VapourSynth-EEDI2
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libeedi2.so $VSPLGPH
+# cd ..
+#
+# # download eedi2cuda (https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA)
+# echo -e "\e[42m Download eedi2cuda \e[0m"
+# wget https://github.com/fu-loser-ck/VapourSynth-EEDI2CUDA/releases/download/240124/libEEDI2CUDA.7z
+# 7z x libEEDI2CUDA.7z
+# install libEEDI2CUDA.so $VSPLGPH
+#
+# # build eedi3
+# echo -e "\e[42m Build eedi3 \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-EEDI3 --depth 1
+# cd VapourSynth-EEDI3
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libeedi3m.so $VSPLGPH
+# cd ..
+#
+# # build sangnom
+# echo -e "\e[42m Build sangnom \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-sangnom --depth 1
+# cd vapoursynth-sangnom
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libsangnom.so $VSPLGPH
+# cd ..
+#
+# # build vs-miscfilters-obsolete
+# echo -e "\e[42m Build vs-miscfilters-obsolete \e[0m"
+# git clone --recursive https://github.com/vapoursynth/vs-miscfilters-obsolete --depth 1
+# cd vs-miscfilters-obsolete
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build ttempsmooth
+# echo -e "\e[42m Build ttempsmooth \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-TTempSmooth --depth 1
+# cd VapourSynth-TTempSmooth
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build bwdif
+# echo -e "\e[42m Build bwdif \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Bwdif --depth 1
+# cd VapourSynth-Bwdif
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build yadifmod
+# echo -e "\e[42m Build yadifmod \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Yadifmod --depth 1
+# cd VapourSynth-Yadifmod
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build deblock
+# echo -e "\e[42m Build deblock \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Deblock --depth 1
+# cd VapourSynth-Deblock
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build addgrain
+# echo -e "\e[42m Build AddGrain \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-AddGrain --depth 1
+# cd VapourSynth-AddGrain
+# CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build neo_fft3d
+# echo -e "\e[42m Build neo_fft3d \e[0m"
+# cp $MYICPH/avisynth/*.h $MYICPH
+# cp -r $MYICPH/avisynth/avs $MYICPH
+# git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_FFT3D --depth 1
+# cd neo_FFT3D
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+# cmake --build build --verbose
+# install build/libneo-fft3d.so $VSPLGPH
+# cd ..
+#
+# # build wwxd
+# echo -e "\e[42m Build wwxd \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-wwxd --depth 1
+# cd vapoursynth-wwxd
+# gcc -O3 -ffast-math -Wall -march=$cpu -I. -I"$MYICPH/vapoursynth" -fPIC -Wall -Wextra -Wno-unused-parameter -shared -o libwwxd.so src/wwxd.c src/detection.c -lm
+# install libwwxd.so $VSPLGPH
+# cd ..
+#
+# # build awarpsharp2
+# echo -e "\e[42m Build awarpsharp2 \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-awarpsharp2 --depth 1
+# cd vapoursynth-awarpsharp2
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# install build/libawarpsharp2.so $VSPLGPH
+# cd ..
+#
+# # build fluxsmooth
+# echo -e "\e[42m Build fluxsmooth \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-fluxsmooth --depth 1
+# cd vapoursynth-fluxsmooth
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+# make -j$(nproc)
+# install .libs/libfluxsmooth.* $VSPLGPH
+# cd ..
 
 # build neo_f3kdb
 echo -e "\e[42m Build neo_f3kdb \e[0m"
-git clone --recursive https://github.com/HomeOfAviSynthPlusEvolution/neo_f3kdb.git --depth 1
+rm -rf neo_FFT3D
+git clone --recursive https://github.com/kskshaf/neo_FFT3D.git --depth 1
 cd neo_f3kdb
 PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release --verbose -j $(nproc)

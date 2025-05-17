@@ -504,7 +504,7 @@ cd ..
 echo -e "\e[42m Build adaptivegrain \e[0m"
 git clone https://github.com/kageru/adaptivegrain --depth 1
 cd adaptivegrain
-RUSTFLAGS="-C target-cpu=$cpu --emit asm" cargo build --release --target=x86_64-pc-linux-gnu --locked
+RUSTFLAGS="-C target-cpu=$cpu" cargo build --release
 install target/x86_64-pc-linux-gnu/release/libadaptivegrain_rs.so $VSPLGPH
 cd ..
 

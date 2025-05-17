@@ -343,7 +343,6 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 
 # # build subtext
 # echo -e "\e[42m Build subtext \e[0m"
-# rm -rf subtext
 # git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
 # cd subtext
 # PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" meson setup --prefix=$OWN_PREFIX build .
@@ -357,151 +356,151 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # make uninstall
 # popd
 
-# build bm3dcuda
-echo -e "\e[42m Build bm3dcuda \e[0m"
-rm -rf VapourSynth-BM3DCUDA
-git clone --recursive https://github.com/WolframRhodium/VapourSynth-BM3DCUDA --depth 1
-cd VapourSynth-BM3DCUDA
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
-cmake --build build --verbose
-cmake --install build --prefix $OWN_PREFIX
-mv $OWN_PREFIX/lib/libbm3d* $VSPLGPH
-cd ..
-
-# build fmtc
-echo -e "\e[42m Build fmtc \e[0m"
-git clone https://gitlab.com/EleonoreMizo/fmtconv.git --depth 1
-pushd fmtconv/build/unix
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
-make -j$(nproc)
-make install
-mv $OWN_PREFIX/lib/libfmtconv* $VSPLGPH
-popd
-
-# build bm3d
-echo -e "\e[42m Build bm3d \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-BM3D --depth 1
-cd VapourSynth-BM3D
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build dctfilter
-echo -e "\e[42m Build dctfilter \e[0m"
-git clone --recursive https://github.com/AmusementClub/VapourSynth-DCTFilter --depth 1
-cd VapourSynth-DCTFilter
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build fft3dfilter
-echo -e "\e[42m Build fft3dfilter \e[0m"
-git clone --recursive https://github.com/AmusementClub/VapourSynth-FFT3DFilter --depth 1
-cd VapourSynth-FFT3DFilter
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build descale & collect descale functions
-# git clone https://github.com/AmusementClub/descale.git # error: core dump
-echo -e "\e[42m Build descale \e[0m"
-git clone https://github.com/Irrational-Encoding-Wizardry/descale --depth 1
-cd descale
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-mv descale.py $VSFUNCPH
-cd ..
-
-# build knlm
-echo -e "\e[42m Build knlm \e[0m"
-git clone --recursive https://github.com/pinterf/KNLMeansCL.git --depth 1
-# please read readme_build.txt at first
-cd KNLMeansCL
-CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build knlm-cuda
-echo -e "\e[42m Build knlm-cuda \e[0m"
-git clone --recursive https://github.com/AmusementClub/vs-nlm-cuda --depth 1
-cd vs-nlm-cuda
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -D VS_INCLUDE_DIR="$MYICPH/vapoursynth" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -ffast-math" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
-cmake --build build --config Release --verbose
-cmake --install build --prefix $OWN_PREFIX
-cd ..
-
-# build mvtools
-echo -e "\e[42m Build mvtools \e[0m"
-git clone --recursive https://github.com/dubhater/vapoursynth-mvtools --depth 1
-cd vapoursynth-mvtools
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-mv $OWN_PREFIX/lib/libmvtools* $VSPLGPH
-cd ..
-
-# build vsremovegrain
-echo -e "\e[42m Build vsremovegrain \e[0m"
-git clone --recursive https://github.com/vapoursynth/vs-removegrain --depth 1
-cd vs-removegrain
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build Bilateral
-echo -e "\e[42m Build Bilateral \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Bilateral --depth 1
-cd VapourSynth-Bilateral
-PKG_CONFIG_PATH=$MYPKGPH ./configure --install="$VSPLGPH" --extra-cxxflags="$NATIVE"
-make -j$(nproc)
-make install
-cd ..
-
-# build BilateralGPU
-echo -e "\e[42m Build BilateralGPU \e[0m"
-git clone --recursive https://github.com/WolframRhodium/VapourSynth-BilateralGPU --depth 1
-cd VapourSynth-BilateralGPU
-PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -LA -DCMAKE_BUILD_TYPE=Release -DUSE_NVRTC_STATIC=ON -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math -march=$cpu" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
-cmake --build build --verbose
-cmake --install build --prefix $OWN_PREFIX
-mv $OWN_PREFIX/lib/libbilateralgpu* $VSPLGPH
-cd ..
-
-# build cas
-echo -e "\e[42m Build CAS \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-CAS.git --depth 1 vs-cas
-cd vs-cas
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
-
-# build edgefixer
-echo -e "\e[42m Build edgefixer \e[0m"
-git clone --recursive https://github.com/sekrit-twc/EdgeFixer --depth 1
-pushd EdgeFixer/EdgeFixer
-gcc -O3 -ffast-math -Wall $NATIVE -I. -I"$MYICPH/vapoursynth" -shared -o libedgefixer.so edgefixer.c vsplugin.c -lm
-install libedgefixer.so $VSPLGPH
-popd
-
-# build ctmf
-echo -e "\e[42m Build ctmf \e[0m"
-git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-CTMF --depth 1
-cd VapourSynth-CTMF
-PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-cd ..
+# # build bm3dcuda
+# echo -e "\e[42m Build bm3dcuda \e[0m"
+# git clone --recursive https://github.com/WolframRhodium/VapourSynth-BM3DCUDA --depth 1
+# cd VapourSynth-BM3DCUDA
+# PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -GNinja -DUSE_NVRTC_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math $NATIVE" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
+# cmake --build build --verbose
+# cmake --install build --prefix $OWN_PREFIX
+# mv $OWN_PREFIX/lib/libbm3d* $VSPLGPH
+# cd ..
+#
+# # build fmtc
+# echo -e "\e[42m Build fmtc \e[0m"
+# git clone https://gitlab.com/EleonoreMizo/fmtconv.git --depth 1
+# pushd fmtconv/build/unix
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./autogen.sh
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --prefix=$OWN_PREFIX
+# make -j$(nproc)
+# make install
+# mv $OWN_PREFIX/lib/libfmtconv* $VSPLGPH
+# popd
+#
+# # build bm3d
+# echo -e "\e[42m Build bm3d \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-BM3D --depth 1
+# cd VapourSynth-BM3D
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build dctfilter
+# echo -e "\e[42m Build dctfilter \e[0m"
+# git clone --recursive https://github.com/AmusementClub/VapourSynth-DCTFilter --depth 1
+# cd VapourSynth-DCTFilter
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build fft3dfilter
+# echo -e "\e[42m Build fft3dfilter \e[0m"
+# git clone --recursive https://github.com/AmusementClub/VapourSynth-FFT3DFilter --depth 1
+# cd VapourSynth-FFT3DFilter
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build descale & collect descale functions
+# # git clone https://github.com/AmusementClub/descale.git # error: core dump
+# echo -e "\e[42m Build descale \e[0m"
+# git clone https://github.com/Irrational-Encoding-Wizardry/descale --depth 1
+# cd descale
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# mv descale.py $VSFUNCPH
+# cd ..
+#
+# # build knlm
+# echo -e "\e[42m Build knlm \e[0m"
+# git clone --recursive https://github.com/pinterf/KNLMeansCL.git --depth 1
+# # please read readme_build.txt at first
+# cd KNLMeansCL
+# CC=clang CXX=clang++ PKG_CONFIG_PATH=$MYPKGPH meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build knlm-cuda
+# echo -e "\e[42m Build knlm-cuda \e[0m"
+# git clone --recursive https://github.com/AmusementClub/vs-nlm-cuda --depth 1
+# cd vs-nlm-cuda
+# PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -D VS_INCLUDE_DIR="$MYICPH/vapoursynth" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wall -ffast-math" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
+# cmake --build build --config Release --verbose
+# cmake --install build --prefix $OWN_PREFIX
+# cd ..
+#
+# # build mvtools
+# echo -e "\e[42m Build mvtools \e[0m"
+# git clone --recursive https://github.com/dubhater/vapoursynth-mvtools --depth 1
+# cd vapoursynth-mvtools
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# mv $OWN_PREFIX/lib/libmvtools* $VSPLGPH
+# cd ..
+#
+# # build vsremovegrain
+# echo -e "\e[42m Build vsremovegrain \e[0m"
+# git clone --recursive https://github.com/vapoursynth/vs-removegrain --depth 1
+# cd vs-removegrain
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build Bilateral
+# echo -e "\e[42m Build Bilateral \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-Bilateral --depth 1
+# cd VapourSynth-Bilateral
+# PKG_CONFIG_PATH=$MYPKGPH ./configure --install="$VSPLGPH" --extra-cxxflags="$NATIVE"
+# make -j$(nproc)
+# make install
+# cd ..
+#
+# # build BilateralGPU
+# echo -e "\e[42m Build BilateralGPU \e[0m"
+# git clone --recursive https://github.com/WolframRhodium/VapourSynth-BilateralGPU --depth 1
+# cd VapourSynth-BilateralGPU
+# PKG_CONFIG_PATH=$MYPKGPH cmake -S . -B build -G Ninja -LA -DCMAKE_BUILD_TYPE=Release -DUSE_NVRTC_STATIC=ON -DVAPOURSYNTH_INCLUDE_DIRECTORY="$MYICPH/vapoursynth" -DCMAKE_CXX_FLAGS="-Wall -ffast-math -march=$cpu" -DCMAKE_CUDA_FLAGS="--threads 0 --use_fast_math --resource-usage -Wno-deprecated-gpu-targets" -DCMAKE_CUDA_ARCHITECTURES="50;61-real;70-virtual;75-real;86-real;89-real;90-real;100-real;120-real"
+# cmake --build build --verbose
+# cmake --install build --prefix $OWN_PREFIX
+# mv $OWN_PREFIX/lib/libbilateralgpu* $VSPLGPH
+# cd ..
+#
+# # build cas
+# echo -e "\e[42m Build CAS \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-CAS.git --depth 1 vs-cas
+# cd vs-cas
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
+#
+# # build edgefixer
+# echo -e "\e[42m Build edgefixer \e[0m"
+# git clone --recursive https://github.com/sekrit-twc/EdgeFixer --depth 1
+# pushd EdgeFixer/EdgeFixer
+# gcc -O3 -ffast-math -Wall $NATIVE -I. -I"$MYICPH/vapoursynth" -shared -o libedgefixer.so edgefixer.c vsplugin.c -lm
+# install libedgefixer.so $VSPLGPH
+# popd
+#
+# # build ctmf
+# echo -e "\e[42m Build ctmf \e[0m"
+# git clone --recursive https://github.com/HomeOfVapourSynthEvolution/VapourSynth-CTMF --depth 1
+# cd VapourSynth-CTMF
+# PKG_CONFIG_PATH=$MYPKGPH CFLAGS=$NATIVE CXXFLAGS=$NATIVE meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# cd ..
 
 # build adaptivegrain
 echo -e "\e[42m Build adaptivegrain \e[0m"
+rm -rf adaptivegrain
 git clone https://github.com/kageru/adaptivegrain --depth 1
 cd adaptivegrain
 RUSTFLAGS="-C target-cpu=$cpu" cargo build --release

@@ -52,7 +52,7 @@ pacman --noconfirm -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs boos
 # pacman --noconfirm -U llvm15-15.0.7-1-x86_64.pkg.tar.zst llvm15-libs-15.0.7-1-x86_64.pkg.tar.zst clang15-15.0.7-2-x86_64.pkg.tar.zst compiler-rt15-15.0.7-1-x86_64.pkg.tar.zst
 
 echo -e "\e[42m Build custom python \e[0m"
-wget -c https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
+wget -q https://www.python.org/ftp/python/3.12.10/Python-3.12.10.tar.xz
 tar xf Python-3.12.10.tar.xz
 cd Python-3.12.10
 CFLAGS=$NATIVE CXXFLAGS=$NATIVE ./configure --enable-optimizations --prefix=$OWN_PREFIX &> $OWN_PREFIX/python312_10_conf.log # --with-lto
@@ -161,11 +161,12 @@ cd ..
 echo -e "\e[42m Build obuparse \e[0m"
 git clone --recursive https://github.com/dwbuiten/obuparse --depth 1
 pushd obuparse
-gcc -O2 -c obuparse.c
-ar r libobuparse.a obuparse.o
-install obuparse.h $MYICPH
-install libobuparse.a $MYLDPH
-rm -rf *.a *.o
+# gcc -O2 -c obuparse.c
+# ar r libobuparse.a obuparse.o
+# install obuparse.h $MYICPH
+# install libobuparse.a $MYLDPH
+# rm -rf *.a *.o
+PREFIX=$OWN_PREFIX make -j$(nproc) && make install -j$(nproc)
 popd
 
 # build l-smash static-libs

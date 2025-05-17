@@ -13,7 +13,8 @@ export cpu=native
 export NATIVE="-march=$cpu -mtune=$cpu"
 
 export CUDA_PATH=/opt/cuda
-export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
+export NVCC_CCBIN=/usr/bin/g++-14
+# export NVCC_PREPEND_FLAGS='-ccbin /opt/cuda/bin'
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
@@ -255,37 +256,37 @@ export PATH="$OWN_PREFIX/bin:$PATH"
 # make clean
 # popd
 
-# build ffmpeg 6.1.2 static libs for ffms2
-echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
-#pacman --noconfirm -S amf-headers frei0r ladspa libass
-#git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
-pushd ffmpeg
-PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
-  --disable-doc \
-  --disable-network \
-  --disable-debug \
-  --disable-avx512 \
-  --disable-avx512icl \
-  --disable-shared \
-  --disable-programs \
-  --enable-static \
-  --enable-avcodec \
-  --enable-avformat \
-  --enable-avdevice \
-  --enable-avfilter \
-  --enable-swresample \
-  --enable-swscale\
-  --enable-gpl \
-  --enable-libdav1d \
-  --enable-libvpx \
-  --enable-libxml2 \
-  --enable-lzma \
-  --enable-nvdec \
-  --enable-version3
-make -j$(nproc)
-make install -j$(nproc)
-make clean
-popd
+# # build ffmpeg 6.1.2 static libs for ffms2
+# echo -e "\e[42m Build ffmpeg 6.1.2 \e[0m"
+# #pacman --noconfirm -S amf-headers frei0r ladspa libass
+# #git clone https://git.ffmpeg.org/ffmpeg.git --branch n6.1.2 --depth 1
+# pushd ffmpeg
+# PKG_CONFIG_PATH=$MYPKGPH ./configure --prefix=$OWN_PREFIX \
+#   --disable-doc \
+#   --disable-network \
+#   --disable-debug \
+#   --disable-avx512 \
+#   --disable-avx512icl \
+#   --disable-shared \
+#   --disable-programs \
+#   --enable-static \
+#   --enable-avcodec \
+#   --enable-avformat \
+#   --enable-avdevice \
+#   --enable-avfilter \
+#   --enable-swresample \
+#   --enable-swscale\
+#   --enable-gpl \
+#   --enable-libdav1d \
+#   --enable-libvpx \
+#   --enable-libxml2 \
+#   --enable-lzma \
+#   --enable-nvdec \
+#   --enable-version3
+# make -j$(nproc)
+# make install -j$(nproc)
+# make clean
+# popd
 
 # # build ffms2
 # echo -e "\e[42m Build ffms2 \e[0m"
@@ -340,21 +341,21 @@ popd
 # ninja -C build clean
 # cd ..
 
-# build subtext
-echo -e "\e[42m Build subtext \e[0m"
-rm -rf subtext
-git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
-cd subtext
-PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" meson setup --prefix=$OWN_PREFIX build .
-ninja -C build
-ninja -C build install
-ninja -C build clean
-cd ..
-
-# uninstall ffmpeg build
-pushd ffmpeg
-make uninstall
-popd
+# # build subtext
+# echo -e "\e[42m Build subtext \e[0m"
+# rm -rf subtext
+# git clone --recursive https://github.com/vapoursynth/subtext.git --depth 1
+# cd subtext
+# PKG_CONFIG_PATH=$MYPKGPH LDFLAGS="-Wl,-Bsymbolic" CFLAGS="$NATIVE -I$MYICPH" CXXFLAGS="$NATIVE -I$MYICPH" meson setup --prefix=$OWN_PREFIX build .
+# ninja -C build
+# ninja -C build install
+# ninja -C build clean
+# cd ..
+#
+# # uninstall ffmpeg build
+# pushd ffmpeg
+# make uninstall
+# popd
 
 # build bm3dcuda
 echo -e "\e[42m Build bm3dcuda \e[0m"

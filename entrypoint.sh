@@ -18,7 +18,7 @@ export NVCC_CCBIN=/usr/bin/g++-14
 export PATH="$PATH:/opt/cuda/bin:/opt/cuda/nsight_compute:/opt/cuda/nsight_systems/bin"
 
 echo -e "\e[42m Pacman Install \e[0m"
-pacman --noconfirm --needed -S nasm cuda cuda-tools clang compiler-rt llvm llvm-libs rust onetbb meson wget cmake yasm imagemagick openexr libtiff libheif libmfx libxml2 imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers \
+pacman --noconfirm --needed -S nasm cuda clang compiler-rt llvm llvm-libs rust onetbb meson wget cmake yasm imagemagick openexr libtiff libheif libmfx libxml2 imath qt6-base qt6-websockets qt6-5compat p7zip amf-headers \
 boost bzip2 brotli harfbuzz libpng frei0r-plugins freetype2 ladspa libjxl libass
 
 

@@ -143,7 +143,7 @@ echo -e "\e[42m Build libxml2 \e[0m"
 git clone https://gitlab.gnome.org/GNOME/libxml2.git --branch v2.14.2 --depth 1
 cd libxml2
 PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./autogen.sh
-CFLAGS='-O2 -fno-semantic-interposition' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX
+CFLAGS='-O2 -fno-semantic-interposition -fPIC' PKG_CONFIG_PATH=$OWN_PREFIX/lib/pkgconfig ./configure --prefix=$OWN_PREFIX --enable-static
 make -j$(nproc)
 make install -j$(nproc)
 cp $OWN_PREFIX/lib/pkgconfig/libxml-2.0.pc $OWN_PREFIX/lib/pkgconfig/libxml2.pc
